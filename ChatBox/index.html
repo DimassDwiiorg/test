@@ -84,19 +84,16 @@
     }
     .admin-crown {
       position: absolute;
-      top: -8px;
-      right: -6px;
-      font-size: 14px;
-      background: #1e293b;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-      border: 1px solid #f59e0b;
-      z-index: 2;
+  top: -12px;                  /* Mengapung sedikit di atas kepala */
+  left: 50%;
+  transform: translateX(-50%) rotate(-12deg); /* Posisi tepat di tengah & agak miring */
+  font-size: 16px;
+  background: transparent;     /* Hapus background bulatan abu-abu */
+  border: none;                /* Hapus garis lingkaran */
+  box-shadow: none;
+  filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); /* Efek glow emas halus */
+  z-index: 2;
+  pointer-events: none;
     }
 
     .chat-messages { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
