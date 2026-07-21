@@ -70,13 +70,39 @@
     button.btn-primary { width: 100%; padding: 12px 20px; margin-top: 12px; background: var(--primary); border: none; border-radius: 12px; color: #fff; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
     button.btn-secondary { background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
 
+    /* SPINNER LOADING STYLES */
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+      color: transparent !important;
+    }
+
+    .btn-loading::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      top: 50%;
+      left: 50%;
+      margin-top: -9px;
+      margin-left: -9px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .chat-container { width: 90vw; max-width: 900px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
     .chat-header { padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); }
     .header-actions { display: flex; align-items: center; gap: 16px; }
     .user-profile-summary { display: flex; align-items: center; gap: 10px; padding: 4px 8px; border-radius: 30px; cursor: pointer; }
     .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; display: block; }
     
-    /* FIX AVATAR WRAPPER & MAHKOTA */
+    /* AVATAR WRAPPER & MAHKOTA FLOATING */
     .avatar-wrapper {
       position: relative;
       display: inline-block;
@@ -84,16 +110,16 @@
     }
     .admin-crown {
       position: absolute;
-  top: -12px;                  /* Mengapung sedikit di atas kepala */
-  left: 50%;
-  transform: translateX(-50%) rotate(-12deg); /* Posisi tepat di tengah & agak miring */
-  font-size: 16px;
-  background: transparent;     /* Hapus background bulatan abu-abu */
-  border: none;                /* Hapus garis lingkaran */
-  box-shadow: none;
-  filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); /* Efek glow emas halus */
-  z-index: 2;
-  pointer-events: none;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-12deg);
+      font-size: 16px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8));
+      z-index: 2;
+      pointer-events: none;
     }
 
     .chat-messages { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
@@ -102,7 +128,7 @@
     .message-content { background: var(--msg-other); color: var(--text-main); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; }
     .message.mine .message-content { background: var(--msg-mine); color: var(--msg-mine-text); border-radius: 16px; border-top-right-radius: 4px; }
     
-    /* AURA EXCLUSIVE UNTUK CHAT ADMIN */
+    /* AURA CHAT ADMIN */
     .message.admin-msg .message-content {
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(180, 83, 9, 0.35));
       border: 1.5px solid #f59e0b;
@@ -363,17 +389,31 @@
     window.loginWithUsername = async () => {
       const usernameInput = document.getElementById('user-input').value.trim();
       const pass = document.getElementById('pass-input').value;
+      const loginBtn = document.querySelector('#form-username button');
+
       if (!usernameInput || !pass) return showToast('Isi username & password!', 'error');
+
+      loginBtn.classList.add('btn-loading');
+      loginBtn.disabled = true;
+
       const cleanUsername = usernameInput.toLowerCase().replace(/[^a-z0-9]/g, '');
       const dummyEmail = `${cleanUsername}@${firebaseConfig.projectId}.firebaseapp.com`;
+
       try {
         const res = await signInWithEmailAndPassword(auth, dummyEmail, pass);
         await initUserProfile(res.user, usernameInput);
+        showToast('Login berhasil!', 'success');
       } catch (err) {
         try {
           const newRes = await createUserWithEmailAndPassword(auth, dummyEmail, pass);
           await initUserProfile(newRes.user, usernameInput);
-        } catch (cErr) { showToast('Error: ' + cErr.message, 'error'); }
+          showToast('Akun baru berhasil dibuat!', 'success');
+        } catch (cErr) { 
+          showToast('Error: ' + cErr.message, 'error'); 
+        }
+      } finally {
+        loginBtn.classList.remove('btn-loading');
+        loginBtn.disabled = false;
       }
     };
 
@@ -465,7 +505,7 @@
       });
     }
 
-    // --- INVITE SYSTEM ---
+    /* INVITE SYSTEM */
     window.sendInvite = async () => {
       const targetUser = document.getElementById('invite-username-input').value.trim();
       const gameType = document.getElementById('game-type-select').value;
@@ -532,7 +572,7 @@
       }
     }
 
-    // TIC TAC TOE GAME
+    /* TIC TAC TOE GAME */
     function startTTTMatch(matchId) {
       activeTTTMatchRef = doc(db, "matches", matchId);
       document.getElementById('game-arena-modal').classList.remove('hidden');
@@ -573,7 +613,7 @@
       return null;
     }
 
-    // UTILS
+    /* UTILS */
     onAuthStateChanged(auth, async (user) => {
       if (user) await initUserProfile(user, user.email ? user.email.split('@')[0] : 'User');
       else {
