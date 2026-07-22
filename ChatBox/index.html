@@ -109,13 +109,26 @@
     .reply-btn { opacity: 0; cursor: pointer; font-size: 0.8rem; background: var(--card-bg); border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 8px; align-self: center; transition: opacity 0.2s; }
     .message:hover .reply-btn { opacity: 1; }
 
+    /* READ MORE STYLE */
+    .read-more-btn {
+      color: #38bdf8;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: 4px;
+      text-decoration: underline;
+      display: inline-block;
+    }
+    .message.mine .read-more-btn {
+      color: #93c5fd;
+    }
+
     /* AURA CHAT ADMIN */
     .message.admin-msg .message-content { background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(180, 83, 9, 0.35)); border: 1.5px solid #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.25); color: #fff; }
     .username-tag { font-size: 0.8em; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .username-admin { color: #fbbf24 !important; font-weight: 800 !important; text-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
     .admin-badge { background: #f59e0b; color: #000; font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
 
-    .message-text { font-size: 0.9em; line-height: 1.4; word-break: break-word; }
+    .message-text { font-size: 0.9em; line-height: 1.4; word-break: break-word; white-space: pre-wrap; }
     .timestamp { font-size: 0.68em; color: var(--text-muted); margin-top: 4px; text-align: right; }
     .message.mine .timestamp { color: rgba(255, 255, 255, 0.7); }
     
@@ -155,60 +168,16 @@
 
     /* MEDIA QUERY RESPONSIF HP */
     @media (max-width: 600px) {
-      body {
-        padding: 0;
-        align-items: flex-start;
-      }
-
-      .chat-container {
-        width: 100vw;
-        height: 100dvh;
-        border-radius: 0;
-        border: none;
-      }
-
-      .chat-header {
-        padding: 10px 12px;
-      }
-
-      .header-title-container h3 {
-        font-size: 0.95rem;
-      }
-
-      .online-badge {
-        padding: 3px 8px;
-        font-size: 0.7rem;
-      }
-
-      .btn-secondary {
-        padding: 6px 10px;
-        font-size: 0.78rem;
-      }
-
-      .user-profile-summary #my-username {
-        max-width: 65px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 0.8rem;
-      }
-
-      .avatar {
-        width: 32px;
-        height: 32px;
-      }
-
-      .theme-toggle-btn {
-        top: 10px;
-        right: 10px;
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
-      }
-
-      .reply-btn {
-        opacity: 1; /* Di HP selalu munculkan tombol reply tanpa perlu hover */
-      }
+      body { padding: 0; align-items: flex-start; }
+      .chat-container { width: 100vw; height: 100dvh; border-radius: 0; border: none; }
+      .chat-header { padding: 10px 12px; }
+      .header-title-container h3 { font-size: 0.95rem; }
+      .online-badge { padding: 3px 8px; font-size: 0.7rem; }
+      .btn-secondary { padding: 6px 10px; font-size: 0.78rem; }
+      .user-profile-summary #my-username { max-width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; }
+      .avatar { width: 32px; height: 32px; }
+      .theme-toggle-btn { top: 10px; right: 10px; width: 36px; height: 36px; font-size: 1rem; }
+      .reply-btn { opacity: 1; }
     }
   </style>
 </head>
@@ -411,9 +380,39 @@
     let tttSymbol = 'X';
     let pendingInviteId = null;
 
-    // STATE UNTUK FEATURE REPLY & TYPING
     let replyTarget = null;
     let typingTimeout = null;
+
+    // FUNGSI UNTUK TOGGLE BACA SELENGKAPNYA
+    window.toggleReadMore = (btn) => {
+      const parent = btn.parentElement;
+      const shortText = parent.querySelector('.text-short');
+      const fullText = parent.querySelector('.text-full');
+
+      if (fullText.classList.contains('hidden')) {
+        shortText.classList.add('hidden');
+        fullText.classList.remove('hidden');
+        btn.innerText = ' Sembunyikan';
+      } else {
+        shortText.classList.remove('hidden');
+        fullText.classList.add('hidden');
+        btn.innerText = '... Baca selengkapnya';
+      }
+    };
+
+    // HELPER UNTUK MENGELOLA FORMAT TEKS BACA SELENGKAPNYA
+    function formatMessageText(text, limit = 300) {
+      const cleanText = escapeHTML(text || '');
+      if (cleanText.length <= limit) {
+        return cleanText;
+      }
+      const truncated = cleanText.substring(0, limit);
+      return `
+        <span class="text-short">${truncated}</span>
+        <span class="text-full hidden">${cleanText}</span>
+        <span class="read-more-btn" onclick="toggleReadMore(this)">... Baca selengkapnya</span>
+      `;
+    }
 
     window.toggleTheme = () => {
       const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -482,7 +481,6 @@
       } catch (error) { console.error("Profile Error:", error); }
     }
 
-    /* --- FEATURE 1: USER ONLINE COUNTER --- */
     async function setupPresence() {
       if (!currentUserData) return;
       const userPresenceRef = doc(db, "presence", currentUserData.uid);
@@ -513,7 +511,6 @@
       });
     }
 
-    /* --- FEATURE 2: TYPING INDICATOR --- */
     window.handleTyping = () => {
       if (!currentUserData) return;
       const typingRef = doc(db, "typing", currentUserData.uid);
@@ -554,7 +551,6 @@
       });
     }
 
-    /* --- FEATURE 3: REPLY CHAT --- */
     window.setReply = (username, text) => {
       replyTarget = { username, text };
       document.getElementById('reply-user-target').innerText = `Membalas ${username}`;
@@ -654,7 +650,7 @@
                 ${msg.username}
                 ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
               </span>
-              <div class="message-text">${escapeHTML(msg.text || '')}</div>
+              <div class="message-text">${formatMessageText(msg.text, 300)}</div>
               <div class="timestamp">${timeStr}</div>
             </div>
             <button class="reply-btn" onclick="setReply('${escapeHTML(msg.username)}', '${escapeHTML(msg.text)}')">↩️ Reply</button>
