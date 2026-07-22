@@ -89,16 +89,42 @@
     .admin-crown { position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-12deg); font-size: 16px; background: transparent; border: none; box-shadow: none; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); z-index: 2; pointer-events: none; }
 
     .chat-messages { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; position: relative; }
-    .message { display: flex; gap: 12px; max-width: 75%; align-items: flex-start; position: relative; group: hover; }
+    .message { display: flex; gap: 12px; max-width: 75%; align-items: flex-start; position: relative; }
     .message.mine { align-self: flex-end; flex-direction: row-reverse; }
-    .message-content { background: var(--msg-other); color: var(--text-main); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; position: relative; }
+    .message-content { background: var(--msg-other); color: var(--text-main); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; position: relative; min-width: 140px; }
     .message.mine .message-content { background: var(--msg-mine); color: var(--msg-mine-text); border-radius: 16px; border-top-right-radius: 4px; }
     
-    /* REPLY DISPLAY INSIDE MESSAGE */
-    .reply-quote { background: rgba(0, 0, 0, 0.15); border-left: 3px solid var(--primary); padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; font-size: 0.8rem; }
-    .message.mine .reply-quote { background: rgba(255, 255, 255, 0.2); border-left: 3px solid #fff; }
-    .reply-quote-user { font-weight: 700; font-size: 0.75rem; opacity: 0.9; }
-    .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 0.8; }
+    /* REPLY DISPLAY INSIDE MESSAGE (STYLE WHATSAPP) */
+    .reply-quote { 
+      background: rgba(0, 0, 0, 0.2); 
+      border-left: 4px solid var(--primary); 
+      border-radius: 8px; 
+      padding: 8px 12px; 
+      margin-bottom: 8px; 
+      font-size: 0.82rem; 
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .message.mine .reply-quote { 
+      background: rgba(0, 0, 0, 0.25); 
+      border-left: 4px solid #ffffff; 
+    }
+    .reply-quote-user { 
+      font-weight: 700; 
+      font-size: 0.78rem; 
+      margin-bottom: 2px;
+      color: var(--primary);
+    }
+    .message.mine .reply-quote-user {
+      color: #ffffff;
+    }
+    .reply-quote-text { 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      white-space: nowrap; 
+      opacity: 0.85; 
+      font-size: 0.8rem;
+    }
 
     /* ACTION BUTTON (REPLY) */
     .reply-btn { opacity: 0; cursor: pointer; font-size: 0.8rem; background: var(--card-bg); border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 8px; align-self: center; transition: opacity 0.2s; }
@@ -112,6 +138,7 @@
 
     .message-text { font-size: 0.92em; line-height: 1.4; word-break: break-word; }
     .timestamp { font-size: 0.68em; color: var(--text-muted); margin-top: 4px; text-align: right; }
+    .message.mine .timestamp { color: rgba(255, 255, 255, 0.7); }
     
     /* INPUT & REPLY PREVIEW AREA */
     .chat-input-wrapper { border-top: 1px solid var(--card-border); background: var(--card-bg); display: flex; flex-direction: column; }
@@ -423,13 +450,11 @@
       if (!currentUserData) return;
       const userPresenceRef = doc(db, "presence", currentUserData.uid);
       
-      // Update status saat ini
       await setDoc(userPresenceRef, {
         username: currentUserData.username,
         lastSeen: serverTimestamp()
       });
 
-      // Update berkala setiap 20 detik
       setInterval(() => {
         setDoc(userPresenceRef, {
           username: currentUserData.username,
@@ -437,7 +462,6 @@
         });
       }, 20000);
 
-      // Listen status online semua user
       onSnapshot(collection(db, "presence"), (snapshot) => {
         let count = 0;
         const now = Date.now();
@@ -445,7 +469,7 @@
           const data = doc.data();
           if (data.lastSeen) {
             const timeDiff = (now - data.lastSeen.toDate().getTime()) / 1000;
-            if (timeDiff < 40) count++; // Dianggap online jika aktif dlm 40 detik
+            if (timeDiff < 40) count++;
           }
         });
         document.getElementById('online-count').innerText = `${count || 1} Online`;
@@ -553,7 +577,6 @@
       input.value = '';
       cancelReply();
 
-      // Hapus status typing setelah kirim
       deleteDoc(doc(db, "typing", currentUserData.uid));
 
       await addDoc(collection(db, "messages"), messagePayload);
@@ -735,8 +758,7 @@
         myCrownEl.classList.remove('hidden');
       } else {
         myUsernameEl.classList.remove('username-admin');
-        myCrownEl.classList.add('hidden');
-        myUsernameEl.style.color = currentUserData.userColor || generateUniqueColor(currentUserData.username);
+        myCrownEl.style.color = currentUserData.userColor || generateUniqueColor(currentUserData.username);
       }
       document.getElementById('my-avatar').src = currentUserData.photoURL;
       document.getElementById('preview-img').src = currentUserData.photoURL;
