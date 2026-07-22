@@ -71,92 +71,65 @@
     button.btn-secondary { background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
 
     /* SPINNER LOADING STYLES */
-    .btn-loading {
-      position: relative;
-      pointer-events: none;
-      color: transparent !important;
-    }
-
-    .btn-loading::after {
-      content: "";
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      top: 50%;
-      left: 50%;
-      margin-top: -9px;
-      margin-left: -9px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #ffffff;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    .btn-loading { position: relative; pointer-events: none; color: transparent !important; }
+    .btn-loading::after { content: ""; position: absolute; width: 18px; height: 18px; top: 50%; left: 50%; margin-top: -9px; margin-left: -9px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #ffffff; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .chat-container { width: 90vw; max-width: 900px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
     .chat-header { padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); }
+    .header-title-container { display: flex; align-items: center; gap: 12px; }
+    .online-badge { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
+    .online-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+
     .header-actions { display: flex; align-items: center; gap: 16px; }
     .user-profile-summary { display: flex; align-items: center; gap: 10px; padding: 4px 8px; border-radius: 30px; cursor: pointer; }
     .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; display: block; }
     
-    /* AVATAR WRAPPER & MAHKOTA FLOATING */
-    .avatar-wrapper {
-      position: relative;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-    .admin-crown {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%) rotate(-12deg);
-      font-size: 16px;
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8));
-      z-index: 2;
-      pointer-events: none;
-    }
+    .avatar-wrapper { position: relative; display: inline-block; flex-shrink: 0; }
+    .admin-crown { position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-12deg); font-size: 16px; background: transparent; border: none; box-shadow: none; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); z-index: 2; pointer-events: none; }
 
-    .chat-messages { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
-    .message { display: flex; gap: 12px; max-width: 75%; align-items: flex-start; }
+    .chat-messages { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; position: relative; }
+    .message { display: flex; gap: 12px; max-width: 75%; align-items: flex-start; position: relative; group: hover; }
     .message.mine { align-self: flex-end; flex-direction: row-reverse; }
-    .message-content { background: var(--msg-other); color: var(--text-main); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; }
+    .message-content { background: var(--msg-other); color: var(--text-main); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; position: relative; }
     .message.mine .message-content { background: var(--msg-mine); color: var(--msg-mine-text); border-radius: 16px; border-top-right-radius: 4px; }
     
+    /* REPLY DISPLAY INSIDE MESSAGE */
+    .reply-quote { background: rgba(0, 0, 0, 0.15); border-left: 3px solid var(--primary); padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; font-size: 0.8rem; }
+    .message.mine .reply-quote { background: rgba(255, 255, 255, 0.2); border-left: 3px solid #fff; }
+    .reply-quote-user { font-weight: 700; font-size: 0.75rem; opacity: 0.9; }
+    .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 0.8; }
+
+    /* ACTION BUTTON (REPLY) */
+    .reply-btn { opacity: 0; cursor: pointer; font-size: 0.8rem; background: var(--card-bg); border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 8px; align-self: center; transition: opacity 0.2s; }
+    .message:hover .reply-btn { opacity: 1; }
+
     /* AURA CHAT ADMIN */
-    .message.admin-msg .message-content {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(180, 83, 9, 0.35));
-      border: 1.5px solid #f59e0b;
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
-      color: #fff;
-    }
+    .message.admin-msg .message-content { background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(180, 83, 9, 0.35)); border: 1.5px solid #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.25); color: #fff; }
     .username-tag { font-size: 0.8em; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-    .username-admin { 
-      color: #fbbf24 !important; 
-      font-weight: 800 !important; 
-      text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
-    }
-    .admin-badge {
-      background: #f59e0b;
-      color: #000;
-      font-size: 0.65rem;
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
+    .username-admin { color: #fbbf24 !important; font-weight: 800 !important; text-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
+    .admin-badge { background: #f59e0b; color: #000; font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
 
     .message-text { font-size: 0.92em; line-height: 1.4; word-break: break-word; }
     .timestamp { font-size: 0.68em; color: var(--text-muted); margin-top: 4px; text-align: right; }
-    .chat-input-area { padding: 16px 20px; display: flex; gap: 12px; border-top: 1px solid var(--card-border); background: var(--card-bg); }
+    
+    /* INPUT & REPLY PREVIEW AREA */
+    .chat-input-wrapper { border-top: 1px solid var(--card-border); background: var(--card-bg); display: flex; flex-direction: column; }
+    .reply-preview-container { padding: 8px 20px; background: var(--input-bg); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+    .reply-preview-info { border-left: 3px solid var(--primary); padding-left: 8px; }
+    .close-reply-btn { cursor: pointer; color: var(--text-muted); font-size: 1.1rem; border: none; background: transparent; }
+
+    .chat-input-area { padding: 16px 20px; display: flex; gap: 12px; }
     .chat-input-area input { flex: 1; margin: 0; }
     .chat-input-area button { width: auto; padding: 0 24px; margin: 0; }
+
+    /* TYPING INDICATOR BUBBLE */
+    .typing-indicator-container { padding: 4px 24px; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .typing-dots { display: inline-flex; gap: 3px; }
+    .typing-dots span { width: 4px; height: 4px; background: var(--text-muted); border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
 
     /* MODAL */
     .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -167,40 +140,10 @@
     .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
     .cell { width: 70px; height: 70px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8em; font-weight: 700; cursor: pointer; }
 
-    /* CONNECT 4 BOARD STYLES - FIX KELUAR BOARD */
-    .c4-board-wrapper {
-      background: #111827;
-      padding: 12px;
-      border-radius: 16px;
-      margin: 16px 0;
-      border: 2px solid var(--card-border);
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .c4-board { 
-      display: grid; 
-      grid-template-columns: repeat(7, 1fr); 
-      gap: 6px; 
-      width: 100%;
-    }
-    .c4-cell { 
-  aspect-ratio: 1 / 1; 
-  width: 100%;
-  background: #374151; /* Warna abu-abu terang kontras (Slate 700) */
-  border-radius: 50%; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  cursor: pointer; 
-  transition: all 0.2s ease;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4); /* Efek lubang papan/kedalaman */
-}
-
-/* Efek saat dikursor/hover */
-.c4-cell:hover { 
-  background: #4b5563; /* Abu-abu sedikit lebih terang saat di-hover */
-  transform: scale(1.05); 
-}
+    .c4-board-wrapper { background: #111827; padding: 12px; border-radius: 16px; margin: 16px 0; border: 2px solid var(--card-border); width: 100%; box-sizing: border-box; }
+    .c4-board { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; width: 100%; }
+    .c4-cell { aspect-ratio: 1 / 1; width: 100%; background: #374151; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4); }
+    .c4-cell:hover { background: #4b5563; transform: scale(1.05); }
     .c4-cell.red { background: #ef4444; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }
     .c4-cell.yellow { background: #eab308; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }
   </style>
@@ -231,7 +174,14 @@
   <!-- CHAT SECTION -->
   <div id="chat-section" class="glass-card chat-container hidden">
     <div class="chat-header">
-      <h3>💬 ROOM-CHAT</h3>
+      <div class="header-title-container">
+        <h3>💬 ROOM-CHAT</h3>
+        <!-- ONLINE USER COUNTER -->
+        <div class="online-badge">
+          <span class="online-dot"></span>
+          <span id="online-count">1 Online</span>
+        </div>
+      </div>
       <div class="header-actions">
         <button class="btn-secondary" onclick="openGameHub()">🎮 Game Mabar</button>
         <div class="user-profile-summary" onclick="openProfileModal()">
@@ -243,10 +193,32 @@
         </div>
       </div>
     </div>
+    
     <div id="chat-messages" class="chat-messages"></div>
-    <div class="chat-input-area">
-      <input type="text" id="message-input" placeholder="Ketik pesan..." onkeypress="handleKeyPress(event)">
-      <button class="btn-primary" onclick="sendMessage()">Kirim</button>
+
+    <!-- TYPING INDICATOR AREA -->
+    <div id="typing-indicator" class="typing-indicator-container hidden">
+      <div class="typing-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <span id="typing-text">Seseorang sedang mengetik...</span>
+    </div>
+
+    <!-- CHAT INPUT & REPLY WRAPPER -->
+    <div class="chat-input-wrapper">
+      <!-- PREVIEW BALASAN/REPLY -->
+      <div id="reply-preview" class="reply-preview-container hidden">
+        <div class="reply-preview-info">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--primary);" id="reply-user-target">Membalas User</div>
+          <div style="font-size:0.8rem; color:var(--text-muted);" id="reply-text-target">Pesan yang dibalas</div>
+        </div>
+        <button class="close-reply-btn" onclick="cancelReply()">&times;</button>
+      </div>
+
+      <div class="chat-input-area">
+        <input type="text" id="message-input" placeholder="Ketik pesan..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
+        <button class="btn-primary" onclick="sendMessage()">Kirim</button>
+      </div>
     </div>
   </div>
 
@@ -337,7 +309,7 @@
       signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
-      getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, getDoc, updateDoc
+      getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, getDoc, updateDoc, setDoc, deleteDoc
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     import { initConnect4 } from "./game-connect4.js";
@@ -374,6 +346,10 @@
     let activeTTTMatchRef = null;
     let tttSymbol = 'X';
     let pendingInviteId = null;
+
+    // STATE UNTUK FEATURE REPLY & TYPING
+    let replyTarget = null;
+    let typingTimeout = null;
 
     window.toggleTheme = () => {
       const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -437,8 +413,99 @@
         updateUI();
         loadMessages();
         listenToInvites();
+        setupPresence();
+        listenToTyping();
       } catch (error) { console.error("Profile Error:", error); }
     }
+
+    /* --- FEATURE 1: USER ONLINE COUNTER --- */
+    async function setupPresence() {
+      if (!currentUserData) return;
+      const userPresenceRef = doc(db, "presence", currentUserData.uid);
+      
+      // Update status saat ini
+      await setDoc(userPresenceRef, {
+        username: currentUserData.username,
+        lastSeen: serverTimestamp()
+      });
+
+      // Update berkala setiap 20 detik
+      setInterval(() => {
+        setDoc(userPresenceRef, {
+          username: currentUserData.username,
+          lastSeen: serverTimestamp()
+        });
+      }, 20000);
+
+      // Listen status online semua user
+      onSnapshot(collection(db, "presence"), (snapshot) => {
+        let count = 0;
+        const now = Date.now();
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.lastSeen) {
+            const timeDiff = (now - data.lastSeen.toDate().getTime()) / 1000;
+            if (timeDiff < 40) count++; // Dianggap online jika aktif dlm 40 detik
+          }
+        });
+        document.getElementById('online-count').innerText = `${count || 1} Online`;
+      });
+    }
+
+    /* --- FEATURE 2: TYPING INDICATOR --- */
+    window.handleTyping = () => {
+      if (!currentUserData) return;
+      const typingRef = doc(db, "typing", currentUserData.uid);
+      
+      setDoc(typingRef, {
+        username: currentUserData.username,
+        isTyping: true,
+        updatedAt: serverTimestamp()
+      });
+
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        deleteDoc(typingRef);
+      }, 2500);
+    };
+
+    function listenToTyping() {
+      onSnapshot(collection(db, "typing"), (snapshot) => {
+        let typingUsers = [];
+        snapshot.forEach((docSnap) => {
+          if (docSnap.id !== currentUserData?.uid) {
+            const data = docSnap.data();
+            if (data.isTyping) typingUsers.push(data.username);
+          }
+        });
+
+        const typingEl = document.getElementById('typing-indicator');
+        const typingText = document.getElementById('typing-text');
+
+        if (typingUsers.length > 0) {
+          typingText.innerText = typingUsers.length === 1 
+            ? `${typingUsers[0]} sedang mengetik...` 
+            : `${typingUsers.join(', ')} sedang mengetik...`;
+          typingEl.classList.remove('hidden');
+        } else {
+          typingEl.classList.add('hidden');
+        }
+      });
+    }
+
+    /* --- FEATURE 3: REPLY CHAT --- */
+    window.setReply = (username, text) => {
+      replyTarget = { username, text };
+      document.getElementById('reply-user-target').innerText = `Membalas ${username}`;
+      document.getElementById('reply-text-target').innerText = text;
+      document.getElementById('reply-preview').classList.remove('hidden');
+      document.getElementById('message-input').focus();
+    };
+
+    window.cancelReply = () => {
+      replyTarget = null;
+      document.getElementById('reply-preview').classList.add('hidden');
+    };
 
     window.saveProfile = async () => {
       const newUsername = document.getElementById('edit-username-input').value.trim();
@@ -468,13 +535,28 @@
       const input = document.getElementById('message-input');
       const text = input.value.trim();
       if (!text || !currentUserData) return;
-      input.value = '';
-      await addDoc(collection(db, "messages"), {
-        uid: currentUserData.uid, username: currentUserData.username,
+      
+      const messagePayload = {
+        uid: currentUserData.uid, 
+        username: currentUserData.username,
         userColor: currentUserData.userColor || generateUniqueColor(currentUserData.username),
-        photoURL: currentUserData.photoURL, role: currentUserData.role || 'user',
-        text: text, createdAt: serverTimestamp()
-      });
+        photoURL: currentUserData.photoURL, 
+        role: currentUserData.role || 'user',
+        text: text, 
+        createdAt: serverTimestamp()
+      };
+
+      if (replyTarget) {
+        messagePayload.replyTo = replyTarget;
+      }
+
+      input.value = '';
+      cancelReply();
+
+      // Hapus status typing setelah kirim
+      deleteDoc(doc(db, "typing", currentUserData.uid));
+
+      await addDoc(collection(db, "messages"), messagePayload);
     };
 
     function loadMessages() {
@@ -490,6 +572,15 @@
           const userColor = msg.userColor || generateUniqueColor(msg.username || 'User');
           const usernameStyle = isAdmin ? '' : `color: ${userColor};`;
 
+          let replyHTML = '';
+          if (msg.replyTo) {
+            replyHTML = `
+              <div class="reply-quote">
+                <div class="reply-quote-user">${escapeHTML(msg.replyTo.username)}</div>
+                <div class="reply-quote-text">${escapeHTML(msg.replyTo.text)}</div>
+              </div>`;
+          }
+
           const msgEl = document.createElement('div');
           msgEl.className = `message ${isMine ? 'mine' : ''} ${isAdmin ? 'admin-msg' : ''}`;
           msgEl.innerHTML = `
@@ -498,13 +589,16 @@
               <img src="${msg.photoURL}" class="avatar">
             </div>
             <div class="message-content">
+              ${replyHTML}
               <span class="username-tag ${isAdmin ? 'username-admin' : ''}" style="${usernameStyle}">
                 ${msg.username}
                 ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
               </span>
               <div class="message-text">${escapeHTML(msg.text || '')}</div>
               <div class="timestamp">${timeStr}</div>
-            </div>`;
+            </div>
+            <button class="reply-btn" onclick="setReply('${escapeHTML(msg.username)}', '${escapeHTML(msg.text)}')">↩️ Reply</button>
+          `;
           container.appendChild(msgEl);
         });
         container.scrollTop = container.scrollHeight;
