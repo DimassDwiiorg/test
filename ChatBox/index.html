@@ -23,6 +23,8 @@
       --msg-other: #f1f5f9;
       --msg-mine: #4f46e5;
       --msg-mine-text: #ffffff;
+      --reply-bg: rgba(0, 0, 0, 0.06);
+      --reply-text: #334155;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
       --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08);
       --modal-overlay: rgba(15, 23, 42, 0.4);
@@ -40,6 +42,8 @@
       --msg-other: #334155;
       --msg-mine: #6366f1;
       --msg-mine-text: #ffffff;
+      --reply-bg: rgba(255, 255, 255, 0.1);
+      --reply-text: #e2e8f0; /* WARNA TEKS REPLY DIPERTERANG */
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
       --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
       --modal-overlay: rgba(0, 0, 0, 0.7);
@@ -95,19 +99,22 @@
     .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; position: relative; }
     .message { display: flex; gap: 10px; max-width: 85%; align-items: flex-start; position: relative; }
     .message.mine { align-self: flex-end; flex-direction: row-reverse; }
-    .message-content { background: var(--msg-other); color: var(--text-main); padding: 10px 14px; border-radius: 16px; border-top-left-radius: 4px; position: relative; min-width: 120px; }
+    .message-content { background: var(--msg-other); color: var(--text-main); padding: 10px 14px; border-radius: 16px; border-top-left-radius: 4px; position: relative; min-width: 120px; cursor: pointer; }
     .message.mine .message-content { background: var(--msg-mine); color: var(--msg-mine-text); border-radius: 16px; border-top-right-radius: 4px; }
     
-    /* REPLY DISPLAY INSIDE MESSAGE */
-    .reply-quote { background: rgba(0, 0, 0, 0.2); border-left: 4px solid var(--primary); border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; font-size: 0.82rem; width: 100%; box-sizing: border-box; }
-    .message.mine .reply-quote { background: rgba(0, 0, 0, 0.25); border-left: 4px solid #ffffff; }
+    /* REPLY DISPLAY INSIDE MESSAGE - TERANG & JELAS */
+    .reply-quote { background: var(--reply-bg); border-left: 4px solid var(--primary); border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; font-size: 0.82rem; width: 100%; box-sizing: border-box; }
+    .message.mine .reply-quote { background: rgba(0, 0, 0, 0.2); border-left: 4px solid #ffffff; }
     .reply-quote-user { font-weight: 700; font-size: 0.78rem; margin-bottom: 2px; color: var(--primary); }
     .message.mine .reply-quote-user { color: #ffffff; }
-    .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 0.85; font-size: 0.8rem; }
+    .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--reply-text); font-size: 0.8rem; font-weight: 500; }
+    .message.mine .reply-quote-text { color: rgba(255, 255, 255, 0.9); }
 
-    /* ACTION BUTTON (REPLY) */
-    .reply-btn { opacity: 0; cursor: pointer; font-size: 0.8rem; background: var(--card-bg); border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 8px; align-self: center; transition: opacity 0.2s; }
-    .message:hover .reply-btn { opacity: 1; }
+    /* ACTION BUTTON (REPLY) - DEFAULT DITHIDE DI MOBILE SEBELUM DIKLIK */
+    .reply-btn { opacity: 0; pointer-events: none; cursor: pointer; font-size: 0.8rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 4px 8px; border-radius: 8px; align-self: center; transition: opacity 0.2s, transform 0.2s; transform: scale(0.9); }
+    
+    /* Hover untuk PC / Chat Aktif untuk HP */
+    .message:hover .reply-btn, .message.active-chat .reply-btn { opacity: 1; pointer-events: auto; transform: scale(1); }
 
     /* READ MORE STYLE */
     .read-more-btn {
@@ -177,7 +184,6 @@
       .user-profile-summary #my-username { max-width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; }
       .avatar { width: 32px; height: 32px; }
       .theme-toggle-btn { top: 10px; right: 10px; width: 36px; height: 36px; font-size: 1rem; }
-      .reply-btn { opacity: 1; }
     }
   </style>
 </head>
@@ -209,7 +215,6 @@
     <div class="chat-header">
       <div class="header-title-container">
         <h3>💬 ROOM-CHAT</h3>
-        <!-- ONLINE USER COUNTER -->
         <div class="online-badge">
           <span class="online-dot"></span>
           <span id="online-count">1 Online</span>
@@ -239,7 +244,6 @@
 
     <!-- CHAT INPUT & REPLY WRAPPER -->
     <div class="chat-input-wrapper">
-      <!-- PREVIEW BALASAN/REPLY -->
       <div id="reply-preview" class="reply-preview-container hidden">
         <div class="reply-preview-info">
           <div style="font-size:0.75rem; font-weight:700; color:var(--primary);" id="reply-user-target">Membalas User</div>
@@ -383,7 +387,37 @@
     let replyTarget = null;
     let typingTimeout = null;
 
-    // FUNGSI UNTUK TOGGLE BACA SELENGKAPNYA
+    // EVENT LISTENER KLIK DI LUAR CHAT UNTUK MENUTUP TOMBOL REPLY DI HP
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.message')) {
+        document.querySelectorAll('.message.active-chat').forEach(msg => {
+          msg.classList.remove('active-chat');
+        });
+      }
+    });
+
+    // FUNGSI TOGGLE REPLAY BUTTON SAAT CHAT DI-TAP
+    window.toggleChatActive = (event, element) => {
+      // Mencegah trigger saat menekan tombol 'Baca Selengkapnya' atau tombol reply itu sendiri
+      if (event.target.classList.contains('read-more-btn') || event.target.closest('.reply-btn')) {
+        return;
+      }
+      
+      const parentMessage = element.closest('.message');
+      const isAlreadyActive = parentMessage.classList.contains('active-chat');
+      
+      // Sembunyikan semua tombol reply yang terbuka dulu
+      document.querySelectorAll('.message.active-chat').forEach(msg => {
+        msg.classList.remove('active-chat');
+      });
+
+      // Jika belum aktif, aktifkan
+      if (!isAlreadyActive) {
+        parentMessage.classList.add('active-chat');
+      }
+    };
+
+    // FUNGSI TOGGLE BACA SELENGKAPNYA
     window.toggleReadMore = (btn) => {
       const parent = btn.parentElement;
       const shortText = parent.querySelector('.text-short');
@@ -400,7 +434,6 @@
       }
     };
 
-    // HELPER UNTUK MENGELOLA FORMAT TEKS BACA SELENGKAPNYA
     function formatMessageText(text, limit = 300) {
       const cleanText = escapeHTML(text || '');
       if (cleanText.length <= limit) {
@@ -644,7 +677,7 @@
               ${isAdmin ? '<span class="admin-crown">👑</span>' : ''}
               <img src="${msg.photoURL}" class="avatar">
             </div>
-            <div class="message-content">
+            <div class="message-content" onclick="toggleChatActive(event, this)">
               ${replyHTML}
               <span class="username-tag ${isAdmin ? 'username-admin' : ''}" style="${usernameStyle}">
                 ${msg.username}
