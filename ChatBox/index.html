@@ -39,8 +39,8 @@
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --input-bg: #1e293b;
-      --msg-other: #334155;
-      --msg-mine: #6366f1;
+      --msg-other: #27303f;
+      --msg-mine: #5b63f6;
       --msg-mine-text: #ffffff;
       --reply-bg: rgba(255, 255, 255, 0.1);
       --reply-text: #e2e8f0;
@@ -96,11 +96,30 @@
     .avatar-wrapper { position: relative; display: inline-block; flex-shrink: 0; }
     .admin-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-12deg); font-size: 14px; background: transparent; border: none; box-shadow: none; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); z-index: 2; pointer-events: none; }
 
-    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; position: relative; }
-    .message { display: flex; gap: 10px; max-width: 85%; align-items: flex-start; position: relative; }
+    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; position: relative; }
+    
+    /* BUBBLE CHAT DINAMIS */
+    .message { display: flex; gap: 8px; max-width: 75%; align-items: flex-start; position: relative; width: fit-content; }
     .message.mine { align-self: flex-end; flex-direction: row-reverse; }
-    .message-content { background: var(--msg-other); color: var(--text-main); padding: 10px 14px; border-radius: 16px; border-top-left-radius: 4px; position: relative; min-width: 120px; cursor: pointer; }
-    .message.mine .message-content { background: var(--msg-mine); color: var(--msg-mine-text); border-radius: 16px; border-top-right-radius: 4px; }
+    
+    .message-content { 
+      background: var(--msg-other); 
+      color: var(--text-main); 
+      padding: 8px 12px; 
+      border-radius: 12px; 
+      border-top-left-radius: 2px;
+      position: relative; 
+      width: fit-content; 
+      max-width: 100%;
+      cursor: pointer; 
+    }
+    
+    .message.mine .message-content { 
+      background: var(--msg-mine); 
+      color: var(--msg-mine-text); 
+      border-radius: 12px; 
+      border-top-right-radius: 2px; 
+    }
     
     /* REPLY DISPLAY INSIDE MESSAGE */
     .reply-quote { background: var(--reply-bg); border-left: 4px solid var(--primary); border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; font-size: 0.82rem; width: 100%; box-sizing: border-box; }
@@ -128,14 +147,20 @@
     .message.mine .read-more-btn { color: #93c5fd; }
 
     /* AURA CHAT ADMIN */
-    .message.admin-msg .message-content { background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(180, 83, 9, 0.35)); border: 1.5px solid #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.25); color: #fff; }
-    .username-tag { font-size: 0.8em; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-    .username-admin { color: #fbbf24 !important; font-weight: 800 !important; text-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
-    .admin-badge { background: #f59e0b; color: #000; font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+    .message.admin-msg .message-content { 
+      background: #231b10; 
+      border: 1.5px solid #f59e0b; 
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.25); 
+      color: #fff; 
+    }
+    
+    .username-tag { font-size: 0.78rem; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; }
+    .username-admin { color: #f59e0b !important; font-weight: 800 !important; }
+    .admin-badge { background: #f59e0b; color: #000; font-size: 0.6rem; padding: 1px 5px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
 
-    .message-text { font-size: 0.9em; line-height: 1.4; word-break: break-word; white-space: pre-wrap; }
-    .timestamp { font-size: 0.68em; color: var(--text-muted); margin-top: 4px; text-align: right; }
-    .message.mine .timestamp { color: rgba(255, 255, 255, 0.7); }
+    .message-text { font-size: 0.88rem; line-height: 1.35; word-break: break-word; white-space: pre-wrap; }
+    .timestamp { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; text-align: right; opacity: 0.8; }
+    .message.mine .timestamp { color: rgba(255, 255, 255, 0.75); }
     
     /* INPUT & PREVIEW AREA */
     .chat-input-wrapper { border-top: 1px solid var(--card-border); background: var(--card-bg); display: flex; flex-direction: column; }
@@ -524,14 +549,12 @@
         try {
           const msgRef = doc(db, "messages", docId);
           if (isAdmin) {
-            // Admin menghapus pesan siapapun
             await updateDoc(msgRef, {
               isDeletedByAdmin: true,
               text: "Pesan ini dihapus oleh admin"
             });
             showToast("Pesan dihapus oleh Admin", "success");
           } else {
-            // User menghapus pesannya sendiri ala WhatsApp
             await updateDoc(msgRef, {
               isDeleted: true,
               text: "Pesan ini telah dihapus"
@@ -606,7 +629,6 @@
           const userColor = msg.userColor || generateUniqueColor(msg.username || 'User');
           const usernameStyle = isAdmin ? '' : `color: ${userColor};`;
 
-          // Cek status hapus
           const isDeletedUser = msg.isDeleted;
           const isDeletedAdmin = msg.isDeletedByAdmin;
           const isDeleted = isDeletedUser || isDeletedAdmin;
@@ -620,7 +642,6 @@
               </div>`;
           }
 
-          // Render Isi Pesan
           let contentHTML = '';
           if (isDeletedAdmin) {
             contentHTML = `<div class="deleted-text deleted-admin">🚫 Pesan ini dihapus oleh admin</div>`;
@@ -635,17 +656,14 @@
             `;
           }
 
-          // Tombol Aksi
           let actionsHTML = '';
           if (!isDeleted) {
             actionsHTML += `<button class="msg-btn" onclick="setReply('${escapeHTML(msg.username)}', '${escapeHTML(msg.text)}')">↩️ Reply</button>`;
             
-            // Pengirim Asli bisa Edit & Hapus pesannya
             if (isMine) {
               actionsHTML += `<button class="msg-btn" onclick="setEdit('${docId}', '${escapeHTML(msg.text)}')">✏️ Edit</button>`;
               actionsHTML += `<button class="msg-btn danger" onclick="deleteMessage('${docId}', '${msg.uid}')">🗑️ Hapus</button>`;
             } 
-            // Jika BUKAN pengirim tapi dia ADMIN, bisa Hapus Permanen
             else if (isUserAdmin) {
               actionsHTML += `<button class="msg-btn danger" onclick="deleteMessage('${docId}', '${msg.uid}')">🗑️ Hapus (Admin)</button>`;
             }
