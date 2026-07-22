@@ -43,7 +43,7 @@
       --msg-mine: #6366f1;
       --msg-mine-text: #ffffff;
       --reply-bg: rgba(255, 255, 255, 0.1);
-      --reply-text: #e2e8f0; /* WARNA TEKS REPLY DIPERTERANG */
+      --reply-text: #e2e8f0;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
       --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
       --modal-overlay: rgba(0, 0, 0, 0.7);
@@ -102,7 +102,7 @@
     .message-content { background: var(--msg-other); color: var(--text-main); padding: 10px 14px; border-radius: 16px; border-top-left-radius: 4px; position: relative; min-width: 120px; cursor: pointer; }
     .message.mine .message-content { background: var(--msg-mine); color: var(--msg-mine-text); border-radius: 16px; border-top-right-radius: 4px; }
     
-    /* REPLY DISPLAY INSIDE MESSAGE - TERANG & JELAS */
+    /* REPLY DISPLAY INSIDE MESSAGE */
     .reply-quote { background: var(--reply-bg); border-left: 4px solid var(--primary); border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; font-size: 0.82rem; width: 100%; box-sizing: border-box; }
     .message.mine .reply-quote { background: rgba(0, 0, 0, 0.2); border-left: 4px solid #ffffff; }
     .reply-quote-user { font-weight: 700; font-size: 0.78rem; margin-bottom: 2px; color: var(--primary); }
@@ -110,24 +110,22 @@
     .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--reply-text); font-size: 0.8rem; font-weight: 500; }
     .message.mine .reply-quote-text { color: rgba(255, 255, 255, 0.9); }
 
-    /* ACTION BUTTON (REPLY) - DEFAULT DITHIDE DI MOBILE SEBELUM DIKLIK */
-    .reply-btn { opacity: 0; pointer-events: none; cursor: pointer; font-size: 0.8rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 4px 8px; border-radius: 8px; align-self: center; transition: opacity 0.2s, transform 0.2s; transform: scale(0.9); }
+    /* ACTION BUTTONS GROUP (REPLY, EDIT, DELETE) */
+    .msg-actions { opacity: 0; pointer-events: none; display: flex; gap: 4px; align-self: center; transition: opacity 0.2s, transform 0.2s; transform: scale(0.9); }
+    .msg-btn { cursor: pointer; font-size: 0.78rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 4px 8px; border-radius: 8px; }
+    .msg-btn.danger { color: #ef4444; }
     
-    /* Hover untuk PC / Chat Aktif untuk HP */
-    .message:hover .reply-btn, .message.active-chat .reply-btn { opacity: 1; pointer-events: auto; transform: scale(1); }
+    /* Hover PC / Chat Aktif di HP */
+    .message:hover .msg-actions, .message.active-chat .msg-actions { opacity: 1; pointer-events: auto; transform: scale(1); }
+
+    /* PESAN DIHAPUS STYLES */
+    .deleted-text { font-style: italic; color: var(--text-muted); font-size: 0.85em; display: flex; align-items: center; gap: 4px; }
+    .message.mine .deleted-text { color: rgba(255, 255, 255, 0.7); }
+    .deleted-admin { color: #ef4444 !important; font-weight: 600; font-style: italic; }
 
     /* READ MORE STYLE */
-    .read-more-btn {
-      color: #38bdf8;
-      font-weight: 600;
-      cursor: pointer;
-      margin-left: 4px;
-      text-decoration: underline;
-      display: inline-block;
-    }
-    .message.mine .read-more-btn {
-      color: #93c5fd;
-    }
+    .read-more-btn { color: #38bdf8; font-weight: 600; cursor: pointer; margin-left: 4px; text-decoration: underline; display: inline-block; }
+    .message.mine .read-more-btn { color: #93c5fd; }
 
     /* AURA CHAT ADMIN */
     .message.admin-msg .message-content { background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(180, 83, 9, 0.35)); border: 1.5px solid #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.25); color: #fff; }
@@ -139,11 +137,11 @@
     .timestamp { font-size: 0.68em; color: var(--text-muted); margin-top: 4px; text-align: right; }
     .message.mine .timestamp { color: rgba(255, 255, 255, 0.7); }
     
-    /* INPUT & REPLY PREVIEW AREA */
+    /* INPUT & PREVIEW AREA */
     .chat-input-wrapper { border-top: 1px solid var(--card-border); background: var(--card-bg); display: flex; flex-direction: column; }
-    .reply-preview-container { padding: 8px 16px; background: var(--input-bg); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
-    .reply-preview-info { border-left: 3px solid var(--primary); padding-left: 8px; }
-    .close-reply-btn { cursor: pointer; color: var(--text-muted); font-size: 1.1rem; border: none; background: transparent; }
+    .preview-container { padding: 8px 16px; background: var(--input-bg); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+    .preview-info { border-left: 3px solid var(--primary); padding-left: 8px; }
+    .close-preview-btn { cursor: pointer; color: var(--text-muted); font-size: 1.1rem; border: none; background: transparent; }
 
     .chat-input-area { padding: 12px 16px; display: flex; gap: 10px; }
     .chat-input-area input { flex: 1; margin: 0; }
@@ -161,17 +159,6 @@
     .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { width: 100%; max-width: 420px; padding: 24px; position: relative; }
     .close-modal { position: absolute; top: 18px; right: 20px; cursor: pointer; font-size: 1.2rem; color: var(--text-muted); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
-    /* GAME ARENA STYLES */
-    .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
-    .cell { width: 70px; height: 70px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8em; font-weight: 700; cursor: pointer; }
-
-    .c4-board-wrapper { background: #111827; padding: 12px; border-radius: 16px; margin: 16px 0; border: 2px solid var(--card-border); width: 100%; box-sizing: border-box; }
-    .c4-board { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; width: 100%; }
-    .c4-cell { aspect-ratio: 1 / 1; width: 100%; background: #374151; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4); }
-    .c4-cell:hover { background: #4b5563; transform: scale(1.05); }
-    .c4-cell.red { background: #ef4444; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }
-    .c4-cell.yellow { background: #eab308; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }
 
     /* MEDIA QUERY RESPONSIF HP */
     @media (max-width: 600px) {
@@ -242,19 +229,19 @@
       <span id="typing-text">Seseorang sedang mengetik...</span>
     </div>
 
-    <!-- CHAT INPUT & REPLY WRAPPER -->
+    <!-- CHAT INPUT, EDIT & REPLY PREVIEW AREA -->
     <div class="chat-input-wrapper">
-      <div id="reply-preview" class="reply-preview-container hidden">
-        <div class="reply-preview-info">
-          <div style="font-size:0.75rem; font-weight:700; color:var(--primary);" id="reply-user-target">Membalas User</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);" id="reply-text-target">Pesan yang dibalas</div>
+      <div id="action-preview" class="preview-container hidden">
+        <div class="preview-info">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--primary);" id="preview-title">Membalas User</div>
+          <div style="font-size:0.8rem; color:var(--text-muted);" id="preview-text">Pesan yang dibalas</div>
         </div>
-        <button class="close-reply-btn" onclick="cancelReply()">&times;</button>
+        <button class="close-preview-btn" onclick="cancelAction()">&times;</button>
       </div>
 
       <div class="chat-input-area">
         <input type="text" id="message-input" placeholder="Ketik pesan..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
-        <button class="btn-primary" onclick="sendMessage()">Kirim</button>
+        <button class="btn-primary" id="send-btn" onclick="sendMessage()">Kirim</button>
       </div>
     </div>
   </div>
@@ -276,80 +263,16 @@
     </div>
   </div>
 
-  <!-- GAME HUB MODAL -->
-  <div id="game-hub-modal" class="modal hidden">
-    <div class="glass-card modal-content">
-      <span class="close-modal" onclick="closeModal('game-hub-modal')">&times;</span>
-      <h3 style="font-weight: 700;">🎮 Game Hub Mabar</h3>
-      
-      <div style="margin-top: 16px;">
-        <label style="font-size: 0.8rem; font-weight: 600;">Pilih Permainan:</label>
-        <select id="game-type-select">
-          <option value="tictactoe">❌ Tic-Tac-Toe (3x3)</option>
-          <option value="connect4">🔴 Connect 4 (Empat Beruntun)</option>
-        </select>
-
-        <label style="font-size: 0.8rem; font-weight: 600; margin-top: 8px; display: block;">Username Lawan:</label>
-        <input type="text" id="invite-username-input" placeholder="Ketik username lawan...">
-        <button class="btn-primary" onclick="sendInvite()">Kirim Undangan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- INVITE POPUP -->
-  <div id="invite-received-modal" class="modal hidden">
-    <div class="glass-card modal-content" style="text-align: center;">
-      <h3 style="font-weight: 700;">⚔️ Undangan Mabar!</h3>
-      <p id="invite-text" style="margin: 16px 0; font-size: 0.9rem; color: var(--text-muted);"></p>
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-primary" style="margin: 0;" onclick="acceptInvite()">Terima</button>
-        <button class="btn-secondary" style="background: #ef4444; color: white; border:none; flex: 1;" onclick="declineInvite()">Tolak</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TIC TAC TOE ARENA -->
-  <div id="game-arena-modal" class="modal hidden">
-    <div class="glass-card modal-content" style="width: auto; text-align: center;">
-      <span class="close-modal" onclick="closeModal('game-arena-modal')">&times;</span>
-      <h3 style="font-weight: 700;">Tic-Tac-Toe</h3>
-      <p id="game-status" style="margin-top: 6px; color: var(--primary); font-weight: 600; font-size: 0.88rem;">Menunggu Giliran...</p>
-      <div class="board" id="board">
-        <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
-        <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
-        <div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div>
-      </div>
-      <button class="btn-secondary" onclick="closeModal('game-arena-modal')">Keluar</button>
-    </div>
-  </div>
-
-  <!-- CONNECT 4 ARENA MODAL -->
-  <div id="c4-arena-modal" class="modal hidden">
-    <div class="glass-card modal-content" style="text-align: center;">
-      <span class="close-modal" onclick="closeModal('c4-arena-modal')">&times;</span>
-      <h3 style="font-weight: 700;">🔴 Connect 4 (Empat Beruntun)</h3>
-      <p id="c4-game-status" style="margin-top: 6px; color: var(--primary); font-weight: 600; font-size: 0.88rem;">Menunggu...</p>
-      
-      <div class="c4-board-wrapper">
-        <div id="c4-board" class="c4-board"></div>
-      </div>
-
-      <button class="btn-secondary" onclick="closeModal('c4-arena-modal')">Keluar</button>
-    </div>
-  </div>
-
   <!-- MAIN JS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
-      getAuth, isSignInWithEmailLink, signInWithEmailLink, sendSignInLinkToEmail, 
+      getAuth, sendSignInLinkToEmail, 
       signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
       getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, getDoc, updateDoc, setDoc, deleteDoc
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    import { initConnect4 } from "./game-connect4.js";
 
     window.showToast = (message, type = 'info') => {
       const container = document.getElementById('toast-container');
@@ -376,18 +299,15 @@
     const db = getFirestore(app);
 
     const SUPABASE_URL = "https://hyfhhxrnvqhjarwuickw.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5ZmhoeHJudnFoamFyd3VpY2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MDkyMjEsImV4cCI6MjEwMDE4NTIyMX0.HbFmEMi31rdBntURcO7ephYGQSAAYXKHoy4_DgDAEu4";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInRefiI6Imh5ZmhoeHJudnFoamFyd3VpY2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MDkyMjEsImV4cCI6MjEwMDE4NTIyMX0.HbFmEMi31rdBntURcO7ephYGQSAAYXKHoy4_DgDAEu4";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUserData = null;
-    let activeTTTMatchRef = null;
-    let tttSymbol = 'X';
-    let pendingInviteId = null;
-
     let replyTarget = null;
+    let editTarget = null;
     let typingTimeout = null;
 
-    // EVENT LISTENER KLIK DI LUAR CHAT UNTUK MENUTUP TOMBOL REPLY DI HP
+    // EVENT LISTENER KLIK DI LUAR CHAT UNTUK MENUTUP OPSI DI HP
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.message')) {
         document.querySelectorAll('.message.active-chat').forEach(msg => {
@@ -396,28 +316,22 @@
       }
     });
 
-    // FUNGSI TOGGLE REPLAY BUTTON SAAT CHAT DI-TAP
     window.toggleChatActive = (event, element) => {
-      // Mencegah trigger saat menekan tombol 'Baca Selengkapnya' atau tombol reply itu sendiri
-      if (event.target.classList.contains('read-more-btn') || event.target.closest('.reply-btn')) {
+      if (event.target.classList.contains('read-more-btn') || event.target.closest('.msg-actions')) {
         return;
       }
-      
       const parentMessage = element.closest('.message');
       const isAlreadyActive = parentMessage.classList.contains('active-chat');
       
-      // Sembunyikan semua tombol reply yang terbuka dulu
       document.querySelectorAll('.message.active-chat').forEach(msg => {
         msg.classList.remove('active-chat');
       });
 
-      // Jika belum aktif, aktifkan
       if (!isAlreadyActive) {
         parentMessage.classList.add('active-chat');
       }
     };
 
-    // FUNGSI TOGGLE BACA SELENGKAPNYA
     window.toggleReadMore = (btn) => {
       const parent = btn.parentElement;
       const shortText = parent.querySelector('.text-short');
@@ -436,9 +350,7 @@
 
     function formatMessageText(text, limit = 300) {
       const cleanText = escapeHTML(text || '');
-      if (cleanText.length <= limit) {
-        return cleanText;
-      }
+      if (cleanText.length <= limit) return cleanText;
       const truncated = cleanText.substring(0, limit);
       return `
         <span class="text-short">${truncated}</span>
@@ -508,7 +420,6 @@
         }
         updateUI();
         loadMessages();
-        listenToInvites();
         setupPresence();
         listenToTyping();
       } catch (error) { console.error("Profile Error:", error); }
@@ -518,23 +429,17 @@
       if (!currentUserData) return;
       const userPresenceRef = doc(db, "presence", currentUserData.uid);
       
-      await setDoc(userPresenceRef, {
-        username: currentUserData.username,
-        lastSeen: serverTimestamp()
-      });
+      await setDoc(userPresenceRef, { username: currentUserData.username, lastSeen: serverTimestamp() });
 
       setInterval(() => {
-        setDoc(userPresenceRef, {
-          username: currentUserData.username,
-          lastSeen: serverTimestamp()
-        });
+        setDoc(userPresenceRef, { username: currentUserData.username, lastSeen: serverTimestamp() });
       }, 20000);
 
       onSnapshot(collection(db, "presence"), (snapshot) => {
         let count = 0;
         const now = Date.now();
-        snapshot.forEach((doc) => {
-          const data = doc.data();
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
           if (data.lastSeen) {
             const timeDiff = (now - data.lastSeen.toDate().getTime()) / 1000;
             if (timeDiff < 40) count++;
@@ -548,16 +453,10 @@
       if (!currentUserData) return;
       const typingRef = doc(db, "typing", currentUserData.uid);
       
-      setDoc(typingRef, {
-        username: currentUserData.username,
-        isTyping: true,
-        updatedAt: serverTimestamp()
-      });
+      setDoc(typingRef, { username: currentUserData.username, isTyping: true, updatedAt: serverTimestamp() });
 
       clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        deleteDoc(typingRef);
-      }, 2500);
+      typingTimeout = setTimeout(() => { deleteDoc(typingRef); }, 2500);
     };
 
     function listenToTyping() {
@@ -574,9 +473,7 @@
         const typingText = document.getElementById('typing-text');
 
         if (typingUsers.length > 0) {
-          typingText.innerText = typingUsers.length === 1 
-            ? `${typingUsers[0]} sedang mengetik...` 
-            : `${typingUsers.join(', ')} sedang mengetik...`;
+          typingText.innerText = typingUsers.length === 1 ? `${typingUsers[0]} sedang mengetik...` : `${typingUsers.join(', ')} sedang mengetik...`;
           typingEl.classList.remove('hidden');
         } else {
           typingEl.classList.add('hidden');
@@ -584,19 +481,203 @@
       });
     }
 
+    /* ACTION MANAGEMENT (REPLY & EDIT) */
     window.setReply = (username, text) => {
+      cancelAction();
       replyTarget = { username, text };
-      document.getElementById('reply-user-target').innerText = `Membalas ${username}`;
-      document.getElementById('reply-text-target').innerText = text;
-      document.getElementById('reply-preview').classList.remove('hidden');
+      document.getElementById('preview-title').innerText = `Membalas ${username}`;
+      document.getElementById('preview-text').innerText = text;
+      document.getElementById('action-preview').classList.remove('hidden');
       document.getElementById('message-input').focus();
     };
 
-    window.cancelReply = () => {
-      replyTarget = null;
-      document.getElementById('reply-preview').classList.add('hidden');
+    window.setEdit = (docId, currentText) => {
+      cancelAction();
+      editTarget = { docId, text: currentText };
+      document.getElementById('preview-title').innerText = `Mengedit Pesan`;
+      document.getElementById('preview-text').innerText = currentText;
+      document.getElementById('action-preview').classList.remove('hidden');
+      document.getElementById('message-input').value = currentText;
+      document.getElementById('send-btn').innerText = 'Simpan';
+      document.getElementById('message-input').focus();
     };
 
+    window.cancelAction = () => {
+      replyTarget = null;
+      editTarget = null;
+      document.getElementById('action-preview').classList.add('hidden');
+      document.getElementById('message-input').value = '';
+      document.getElementById('send-btn').innerText = 'Kirim';
+    };
+
+    /* FITUR HAPUS PESAN WA + ADMIN PERMANEN */
+    window.deleteMessage = async (docId, msgUid) => {
+      if (!currentUserData) return;
+      const isAdmin = currentUserData.role === 'admin';
+      const isMine = msgUid === currentUserData.uid;
+
+      if (!isMine && !isAdmin) {
+        return showToast("Anda tidak dapat menghapus pesan orang lain!", "error");
+      }
+
+      if (confirm("Apakah Anda yakin ingin menghapus pesan ini?")) {
+        try {
+          const msgRef = doc(db, "messages", docId);
+          if (isAdmin) {
+            // Admin menghapus pesan siapapun
+            await updateDoc(msgRef, {
+              isDeletedByAdmin: true,
+              text: "Pesan ini dihapus oleh admin"
+            });
+            showToast("Pesan dihapus oleh Admin", "success");
+          } else {
+            // User menghapus pesannya sendiri ala WhatsApp
+            await updateDoc(msgRef, {
+              isDeleted: true,
+              text: "Pesan ini telah dihapus"
+            });
+            showToast("Pesan berhasil dihapus", "success");
+          }
+        } catch (err) {
+          showToast("Gagal menghapus: " + err.message, "error");
+        }
+      }
+    };
+
+    window.sendMessage = async () => {
+      const input = document.getElementById('message-input');
+      const text = input.value.trim();
+      if (!text || !currentUserData) return;
+
+      // MODE EDIT PESAN
+      if (editTarget) {
+        try {
+          const msgRef = doc(db, "messages", editTarget.docId);
+          await updateDoc(msgRef, {
+            text: text,
+            isEdited: true
+          });
+          showToast("Pesan berhasil diperbarui", "success");
+        } catch (err) {
+          showToast("Gagal mengedit pesan", "error");
+        }
+        cancelAction();
+        return;
+      }
+      
+      // MODE KIRIM BARU
+      const messagePayload = {
+        uid: currentUserData.uid, 
+        username: currentUserData.username,
+        userColor: currentUserData.userColor || generateUniqueColor(currentUserData.username),
+        photoURL: currentUserData.photoURL, 
+        role: currentUserData.role || 'user',
+        text: text, 
+        createdAt: serverTimestamp(),
+        isDeleted: false,
+        isDeletedByAdmin: false,
+        isEdited: false
+      };
+
+      if (replyTarget) {
+        messagePayload.replyTo = replyTarget;
+      }
+
+      input.value = '';
+      cancelAction();
+      deleteDoc(doc(db, "typing", currentUserData.uid));
+      await addDoc(collection(db, "messages"), messagePayload);
+    };
+
+    function loadMessages() {
+      const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
+      onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('chat-messages');
+        container.innerHTML = '';
+        
+        snapshot.forEach((docSnap) => {
+          const docId = docSnap.id;
+          const msg = docSnap.data();
+          const isMine = msg.uid === currentUserData?.uid;
+          const isAdmin = msg.role === 'admin';
+          const isUserAdmin = currentUserData?.role === 'admin';
+
+          let timeStr = msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Baru saja';
+          const userColor = msg.userColor || generateUniqueColor(msg.username || 'User');
+          const usernameStyle = isAdmin ? '' : `color: ${userColor};`;
+
+          // Cek status hapus
+          const isDeletedUser = msg.isDeleted;
+          const isDeletedAdmin = msg.isDeletedByAdmin;
+          const isDeleted = isDeletedUser || isDeletedAdmin;
+
+          let replyHTML = '';
+          if (msg.replyTo && !isDeleted) {
+            replyHTML = `
+              <div class="reply-quote">
+                <div class="reply-quote-user">${escapeHTML(msg.replyTo.username)}</div>
+                <div class="reply-quote-text">${escapeHTML(msg.replyTo.text)}</div>
+              </div>`;
+          }
+
+          // Render Isi Pesan
+          let contentHTML = '';
+          if (isDeletedAdmin) {
+            contentHTML = `<div class="deleted-text deleted-admin">🚫 Pesan ini dihapus oleh admin</div>`;
+          } else if (isDeletedUser) {
+            contentHTML = `<div class="deleted-text">🚫 Pesan ini telah dihapus</div>`;
+          } else {
+            contentHTML = `
+              <div class="message-text">
+                ${formatMessageText(msg.text, 300)}
+                ${msg.isEdited ? '<span style="font-size:0.7em; opacity:0.7; font-style:italic; margin-left:4px;">(ditinjau)</span>' : ''}
+              </div>
+            `;
+          }
+
+          // Tombol Aksi
+          let actionsHTML = '';
+          if (!isDeleted) {
+            actionsHTML += `<button class="msg-btn" onclick="setReply('${escapeHTML(msg.username)}', '${escapeHTML(msg.text)}')">↩️ Reply</button>`;
+            
+            // Pengirim Asli bisa Edit & Hapus pesannya
+            if (isMine) {
+              actionsHTML += `<button class="msg-btn" onclick="setEdit('${docId}', '${escapeHTML(msg.text)}')">✏️ Edit</button>`;
+              actionsHTML += `<button class="msg-btn danger" onclick="deleteMessage('${docId}', '${msg.uid}')">🗑️ Hapus</button>`;
+            } 
+            // Jika BUKAN pengirim tapi dia ADMIN, bisa Hapus Permanen
+            else if (isUserAdmin) {
+              actionsHTML += `<button class="msg-btn danger" onclick="deleteMessage('${docId}', '${msg.uid}')">🗑️ Hapus (Admin)</button>`;
+            }
+          }
+
+          const msgEl = document.createElement('div');
+          msgEl.className = `message ${isMine ? 'mine' : ''} ${isAdmin ? 'admin-msg' : ''}`;
+          msgEl.innerHTML = `
+            <div class="avatar-wrapper">
+              ${isAdmin ? '<span class="admin-crown">👑</span>' : ''}
+              <img src="${msg.photoURL}" class="avatar">
+            </div>
+            <div class="message-content" onclick="toggleChatActive(event, this)">
+              ${replyHTML}
+              <span class="username-tag ${isAdmin ? 'username-admin' : ''}" style="${usernameStyle}">
+                ${msg.username}
+                ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
+              </span>
+              ${contentHTML}
+              <div class="timestamp">${timeStr}</div>
+            </div>
+            <div class="msg-actions">
+              ${actionsHTML}
+            </div>
+          `;
+          container.appendChild(msgEl);
+        });
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+
+    /* UTILS & AUTH */
     window.saveProfile = async () => {
       const newUsername = document.getElementById('edit-username-input').value.trim();
       const fileInput = document.getElementById('edit-avatar-file');
@@ -621,188 +702,6 @@
       finally { saveBtn.innerText = "Simpan Profil"; saveBtn.disabled = false; }
     };
 
-    window.sendMessage = async () => {
-      const input = document.getElementById('message-input');
-      const text = input.value.trim();
-      if (!text || !currentUserData) return;
-      
-      const messagePayload = {
-        uid: currentUserData.uid, 
-        username: currentUserData.username,
-        userColor: currentUserData.userColor || generateUniqueColor(currentUserData.username),
-        photoURL: currentUserData.photoURL, 
-        role: currentUserData.role || 'user',
-        text: text, 
-        createdAt: serverTimestamp()
-      };
-
-      if (replyTarget) {
-        messagePayload.replyTo = replyTarget;
-      }
-
-      input.value = '';
-      cancelReply();
-
-      deleteDoc(doc(db, "typing", currentUserData.uid));
-
-      await addDoc(collection(db, "messages"), messagePayload);
-    };
-
-    function loadMessages() {
-      const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
-      onSnapshot(q, (snapshot) => {
-        const container = document.getElementById('chat-messages');
-        container.innerHTML = '';
-        snapshot.forEach((doc) => {
-          const msg = doc.data();
-          const isMine = msg.uid === currentUserData?.uid;
-          const isAdmin = msg.role === 'admin';
-          let timeStr = msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Baru saja';
-          const userColor = msg.userColor || generateUniqueColor(msg.username || 'User');
-          const usernameStyle = isAdmin ? '' : `color: ${userColor};`;
-
-          let replyHTML = '';
-          if (msg.replyTo) {
-            replyHTML = `
-              <div class="reply-quote">
-                <div class="reply-quote-user">${escapeHTML(msg.replyTo.username)}</div>
-                <div class="reply-quote-text">${escapeHTML(msg.replyTo.text)}</div>
-              </div>`;
-          }
-
-          const msgEl = document.createElement('div');
-          msgEl.className = `message ${isMine ? 'mine' : ''} ${isAdmin ? 'admin-msg' : ''}`;
-          msgEl.innerHTML = `
-            <div class="avatar-wrapper">
-              ${isAdmin ? '<span class="admin-crown">👑</span>' : ''}
-              <img src="${msg.photoURL}" class="avatar">
-            </div>
-            <div class="message-content" onclick="toggleChatActive(event, this)">
-              ${replyHTML}
-              <span class="username-tag ${isAdmin ? 'username-admin' : ''}" style="${usernameStyle}">
-                ${msg.username}
-                ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
-              </span>
-              <div class="message-text">${formatMessageText(msg.text, 300)}</div>
-              <div class="timestamp">${timeStr}</div>
-            </div>
-            <button class="reply-btn" onclick="setReply('${escapeHTML(msg.username)}', '${escapeHTML(msg.text)}')">↩️ Reply</button>
-          `;
-          container.appendChild(msgEl);
-        });
-        container.scrollTop = container.scrollHeight;
-      });
-    }
-
-    /* INVITE SYSTEM */
-    window.sendInvite = async () => {
-      const targetUser = document.getElementById('invite-username-input').value.trim();
-      const gameType = document.getElementById('game-type-select').value;
-      if (!targetUser) return showToast('Masukkan username lawan!', 'error');
-
-      const matchData = gameType === 'connect4' 
-        ? { board: Array(42).fill(null), turn: '🔴', winner: null, gameType: 'connect4' }
-        : { board: Array(9).fill(null), turn: 'X', winner: null, gameType: 'tictactoe' };
-
-      const matchRef = await addDoc(collection(db, "matches"), matchData);
-
-      await addDoc(collection(db, "invites"), {
-        from: currentUserData.username,
-        to: targetUser,
-        matchId: matchRef.id,
-        gameType: gameType,
-        status: 'pending'
-      });
-
-      showToast(`Undangan ${gameType === 'connect4' ? 'Connect 4' : 'Tic-Tac-Toe'} dikirim ke ${targetUser}`, 'info');
-      closeModal('game-hub-modal');
-    };
-
-    function listenToInvites() {
-      const q = query(collection(db, "invites"));
-      onSnapshot(q, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          const invite = change.doc.data();
-          if (invite.to === currentUserData.username && invite.status === 'pending') {
-            pendingInviteId = change.doc.id;
-            const gameTitle = invite.gameType === 'connect4' ? 'Connect 4 🔴' : 'Tic-Tac-Toe ❌';
-            document.getElementById('invite-text').innerText = `"${invite.from}" mengundangmu bermain ${gameTitle}!`;
-            document.getElementById('invite-received-modal').classList.remove('hidden');
-          }
-          if (invite.from === currentUserData.username && invite.status === 'accepted') {
-            startSelectedGame(invite.matchId, invite.gameType, true);
-          }
-        });
-      });
-    }
-
-    window.acceptInvite = async () => {
-      closeModal('invite-received-modal');
-      const inviteRef = doc(db, "invites", pendingInviteId);
-      const inviteSnap = await getDoc(inviteRef);
-      const data = inviteSnap.data();
-      await updateDoc(inviteRef, { status: 'accepted' });
-
-      startSelectedGame(data.matchId, data.gameType, false);
-    };
-
-    window.declineInvite = async () => {
-      closeModal('invite-received-modal');
-      await updateDoc(doc(db, "invites", pendingInviteId), { status: 'declined' });
-    };
-
-    function startSelectedGame(matchId, gameType, isHost) {
-      if (gameType === 'connect4') {
-        const symbol = isHost ? '🔴' : '🟡';
-        initConnect4(db, matchId, symbol);
-      } else {
-        tttSymbol = isHost ? 'X' : 'O';
-        startTTTMatch(matchId);
-      }
-    }
-
-    /* TIC TAC TOE GAME */
-    function startTTTMatch(matchId) {
-      activeTTTMatchRef = doc(db, "matches", matchId);
-      document.getElementById('game-arena-modal').classList.remove('hidden');
-
-      onSnapshot(activeTTTMatchRef, (docSnap) => {
-        if (!docSnap.exists()) return;
-        const data = docSnap.data();
-        const cells = document.querySelectorAll('.cell');
-        data.board.forEach((val, i) => cells[i].innerText = val || '');
-        const statusEl = document.getElementById('game-status');
-        if (data.winner) {
-          statusEl.innerText = data.winner === 'SERI' ? 'Permainan Seri!' : `Pemenang: ${data.winner}!`;
-        } else {
-          statusEl.innerText = data.turn === tttSymbol ? 'Giliran Kamu!' : 'Menunggu lawan...';
-        }
-      });
-    }
-
-    window.makeMove = async (idx) => {
-      const matchSnap = await getDoc(activeTTTMatchRef);
-      const data = matchSnap.data();
-      if (data.winner || data.turn !== tttSymbol || data.board[idx] !== null) return;
-
-      const newBoard = [...data.board];
-      newBoard[idx] = tttSymbol;
-      
-      let winner = checkTTTWinner(newBoard);
-      let nextTurn = tttSymbol === 'X' ? 'O' : 'X';
-      await updateDoc(activeTTTMatchRef, { board: newBoard, turn: nextTurn, winner: winner });
-    };
-
-    function checkTTTWinner(b) {
-      const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-      for (let [a, b1, c] of lines) {
-        if (b[a] && b[a] === b[b1] && b[a] === b[c]) return b[a];
-      }
-      if (b.every(c => c !== null)) return 'SERI';
-      return null;
-    }
-
-    /* UTILS */
     onAuthStateChanged(auth, async (user) => {
       if (user) await initUserProfile(user, user.email ? user.email.split('@')[0] : 'User');
       else {
@@ -845,8 +744,6 @@
       document.getElementById('profile-modal').classList.remove('hidden');
     };
     window.closeProfileModal = () => document.getElementById('profile-modal').classList.add('hidden');
-    window.openGameHub = () => document.getElementById('game-hub-modal').classList.remove('hidden');
-    window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
     window.logout = () => signOut(auth).then(() => location.reload());
     window.handleKeyPress = (e) => { if (e.key === 'Enter') sendMessage(); };
     window.switchTab = (tab) => {
