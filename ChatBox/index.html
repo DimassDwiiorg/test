@@ -135,9 +135,10 @@
     .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--reply-text); font-size: 0.78rem; font-weight: 500; }
     .message.mine .reply-quote-text { color: rgba(255, 255, 255, 0.9); }
 
-    /* ACTION BUTTON (REPLY) */
-    .reply-btn { opacity: 0; pointer-events: none; cursor: pointer; font-size: 0.75rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 3px 6px; border-radius: 6px; align-self: center; transition: opacity 0.2s, transform 0.2s; transform: scale(0.9); }
-    .message:hover .reply-btn, .message.active-chat .reply-btn { opacity: 1; pointer-events: auto; transform: scale(1); }
+    /* ACTION BUTTONS (REPLY & DELETE) */
+    .message-actions { opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; transform: scale(0.9); }
+    .message:hover .message-actions, .message.active-chat .message-actions { opacity: 1; pointer-events: auto; transform: scale(1); }
+    .reply-btn { cursor: pointer; font-size: 0.75rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 3px 6px; border-radius: 6px; align-self: center; }
 
     /* READ MORE STYLE */
     .read-more-btn { color: #38bdf8; font-weight: 600; cursor: pointer; margin-left: 4px; text-decoration: underline; display: inline-block; }
@@ -436,7 +437,7 @@
         fullText.classList.remove('hidden');
         btn.innerText = ' Sembunyikan';
       } else {
-        shortText.classList.remove('hidden');
+        shortText.remove('hidden');
         fullText.classList.add('hidden');
         btn.innerText = '... Baca selengkapnya';
       }
@@ -656,18 +657,57 @@
       await addDoc(collection(db, "messages"), messagePayload);
     };
 
+    /* FUNGSI DELETE CHAT (USER & ADMIN) */
+    window.deleteMessage = async (msgId, msgUid, isMine) => {
+      if (!currentUserData) return;
+
+      const isAdmin = currentUserData.role === 'admin';
+
+      if (!isMine && !isAdmin) {
+        return showToast('Kamu hanya bisa menghapus pesanmu sendiri!', 'error');
+      }
+
+      if (!confirm('Apakah kamu yakin ingin menghapus pesan ini?')) return;
+
+      try {
+        const msgRef = doc(db, "messages", msgId);
+
+        if (isAdmin && !isMine) {
+          await updateDoc(msgRef, {
+            text: "🚫 Pesan ini telah dihapus oleh Admin!",
+            isDeletedByAdmin: true
+          });
+          showToast('Pesan berhasil dihapus oleh Admin', 'info');
+        } else {
+          await deleteDoc(msgRef);
+          showToast('Pesan berhasil dihapus', 'success');
+        }
+      } catch (err) {
+        showToast('Gagal menghapus pesan: ' + err.message, 'error');
+      }
+    };
+
     function loadMessages() {
       const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
       onSnapshot(q, (snapshot) => {
         const container = document.getElementById('chat-messages');
         container.innerHTML = '';
-        snapshot.forEach((doc) => {
-          const msg = doc.data();
+
+        snapshot.forEach((docSnap) => {
+          const msg = docSnap.data();
+          const msgId = docSnap.id;
           const isMine = msg.uid === currentUserData?.uid;
           const isAdmin = msg.role === 'admin';
-          let timeStr = msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Baru saja';
+          const isCurrentUserAdmin = currentUserData?.role === 'admin';
+
+          let timeStr = msg.createdAt?.toDate 
+            ? msg.createdAt.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+            : 'Baru saja';
+            
           const userColor = msg.userColor || generateUniqueColor(msg.username || 'User');
           const usernameStyle = isAdmin ? '' : `color: ${userColor};`;
+
+          const canDelete = isMine || isCurrentUserAdmin;
 
           let replyHTML = '';
           if (msg.replyTo) {
@@ -676,6 +716,13 @@
                 <div class="reply-quote-user">${escapeHTML(msg.replyTo.username)}</div>
                 <div class="reply-quote-text">${escapeHTML(msg.replyTo.text)}</div>
               </div>`;
+          }
+
+          let messageContentHTML = '';
+          if (msg.isDeletedByAdmin) {
+            messageContentHTML = `<i style="opacity: 0.8; font-size: 0.82rem; color: #ef4444; font-weight: 600;">${msg.text}</i>`;
+          } else {
+            messageContentHTML = formatMessageText(msg.text, 300);
           }
 
           const msgEl = document.createElement('div');
@@ -691,13 +738,18 @@
                 ${msg.username}
                 ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
               </span>
-              <div class="message-text">${formatMessageText(msg.text, 300)}</div>
+              <div class="message-text">${messageContentHTML}</div>
               <div class="timestamp">${timeStr}</div>
             </div>
-            <button class="reply-btn" onclick="setReply('${escapeHTML(msg.username)}', '${escapeHTML(msg.text)}')">↩️ Reply</button>
+            
+            <div class="message-actions" style="display: flex; gap: 4px; align-self: center;">
+              ${!msg.isDeletedByAdmin ? `<button class="reply-btn" onclick="setReply('${escapeHTML(msg.username)}', '${escapeHTML(msg.text)}')">↩️</button>` : ''}
+              ${canDelete ? `<button class="reply-btn" style="color: #ef4444;" onclick="deleteMessage('${msgId}', '${msg.uid}', ${isMine})">🗑️</button>` : ''}
+            </div>
           `;
           container.appendChild(msgEl);
         });
+
         container.scrollTop = container.scrollHeight;
       });
     }
