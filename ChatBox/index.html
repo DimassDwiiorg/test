@@ -103,48 +103,46 @@
       overflow-y: auto; 
       display: flex; 
       flex-direction: column; 
-      gap: 12px; 
+      gap: 14px; 
+      position: relative; 
     }
     
     /* WRAPPER PER PESAN */
     .message { 
       display: flex; 
       gap: 10px; 
-      max-width: 80%; 
-      align-items: flex-end; 
+      max-width: 85%; 
+      align-items: flex-start; 
       position: relative; 
     }
-
     /* BIKIN PESAN KANAN & KIRI PASTI PAS */
     .message:not(.mine) {
       align-self: flex-start; /* Nempel Kiri */
     }
 
     .message.mine { 
-      align-self: flex-end;   /* Nempel Kanan */
+      align-self: flex-end; 
       flex-direction: row-reverse; 
     }
     
     /* BUBBLE CONTENT (RAHASIA GAMBAR 2) */
     .message-content { 
-      background: #1e293b; 
-      color: #f8fafc; 
+      background: var(--msg-other); 
+      color: var(--text-main); 
       padding: 10px 14px; 
-      border-radius: 14px; 
-      border-bottom-left-radius: 2px;
-      display: table; /* Supaya lebarnya fleksibel & selebar teks terpanjang saja */
-      table-layout: fixed;
-      word-wrap: break-word;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      text-align: left;
+      border-radius: 16px; 
+      border-top-left-radius: 4px; 
+      position: relative; 
+      min-width: 120px; 
+      cursor: pointer; 
+      display: table;
     }
     
     .message.mine .message-content { 
-      background: #4f46e5; 
-      color: #ffffff; 
-      border-radius: 14px; 
-      border-bottom-right-radius: 2px; 
-      border-bottom-left-radius: 14px;
+      background: var(--msg-mine); 
+      color: var(--msg-mine-text); 
+      border-radius: 16px; 
+      border-top-right-radius: 4px; 
     }
 
     /* AURA ADMIN KUNING (SAMA KAYA GAMBAR 2) */
