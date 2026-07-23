@@ -96,98 +96,92 @@
     .avatar-wrapper { position: relative; display: inline-block; flex-shrink: 0; }
     .admin-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-12deg); font-size: 14px; background: transparent; border: none; box-shadow: none; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); z-index: 2; pointer-events: none; }
 
-    /* CHAT MESSAGES FIX */
-    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; position: relative; }
+   /* CHAT MESSAGES CONTAINER */
+    .chat-messages { 
+      flex: 1; 
+      padding: 16px; 
+      overflow-y: auto; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+    }
     
-    /* BUBBLE CHAT FIX - PRESISI & PAS UKURAN TEKS */
+    /* WRAPPER PER PESAN */
     .message { 
       display: flex; 
       gap: 10px; 
       max-width: 80%; 
       align-items: flex-end; 
       position: relative; 
-      align-self: flex-start; /* Default kiri (Orang lain) */
+    }
+
+    /* BIKIN PESAN KANAN & KIRI PASTI PAS */
+    .message:not(.mine) {
+      align-self: flex-start; /* Nempel Kiri */
     }
 
     .message.mine { 
-      align-self: flex-end; /* Kanan (Punya sendiri) */
+      align-self: flex-end;   /* Nempel Kanan */
       flex-direction: row-reverse; 
     }
     
+    /* BUBBLE CONTENT (RAHASIA GAMBAR 2) */
     .message-content { 
-      background: var(--msg-other); 
-      color: var(--text-main); 
+      background: #1e293b; 
+      color: #f8fafc; 
       padding: 10px 14px; 
-      border-radius: 16px; 
-      border-bottom-left-radius: 4px;
-      position: relative; 
-      display: inline-block;
-      width: fit-content; 
-      max-width: 100%;
-      cursor: pointer; 
+      border-radius: 14px; 
+      border-bottom-left-radius: 2px;
+      display: table; /* Supaya lebarnya fleksibel & selebar teks terpanjang saja */
+      table-layout: fixed;
+      word-wrap: break-word;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       text-align: left;
     }
     
     .message.mine .message-content { 
-      background: var(--msg-mine); 
-      color: var(--msg-mine-text); 
-      border-radius: 16px; 
-      border-bottom-right-radius: 4px; 
+      background: #4f46e5; 
+      color: #ffffff; 
+      border-radius: 14px; 
+      border-bottom-right-radius: 2px; 
+      border-bottom-left-radius: 14px;
     }
 
-    /* AURA CHAT ADMIN FIX */
+    /* AURA ADMIN KUNING (SAMA KAYA GAMBAR 2) */
     .message.admin-msg .message-content { 
-      background: #1e1b18; 
-      border: 1.5px solid #f59e0b; 
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3); 
-      color: #fff; 
+      background: #1b1b1b; 
+      border: 1px solid #f59e0b; 
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); 
     }
     
-    /* REPLY DISPLAY INSIDE MESSAGE FIX */
+    /* QUOTE REPLY DI DALAM CHAT */
     .reply-quote { 
-      background: var(--reply-bg); 
-      border-left: 3px solid var(--primary); 
-      border-radius: 8px; 
-      padding: 6px 10px; 
-      margin-bottom: 8px; 
-      font-size: 0.8rem; 
-      width: 100%; 
-      box-sizing: border-box; 
-    }
-    .message.mine .reply-quote { 
-      background: rgba(0, 0, 0, 0.25); 
+      background: rgba(0, 0, 0, 0.3); 
       border-left: 3px solid #ffffff; 
+      border-radius: 6px; 
+      padding: 6px 10px; 
+      margin-bottom: 6px; 
+      font-size: 0.8rem; 
+      word-break: break-word;
     }
-    .reply-quote-user { font-weight: 700; font-size: 0.75rem; margin-bottom: 2px; color: #818cf8; }
-    .message.mine .reply-quote-user { color: #ffffff; }
-    .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--reply-text); font-size: 0.78rem; font-weight: 400; }
-    .message.mine .reply-quote-text { color: rgba(255, 255, 255, 0.85); }
 
-    /* ACTION BUTTONS GROUP (REPLY, EDIT, DELETE) */
-    .msg-actions { opacity: 0; pointer-events: none; display: flex; gap: 4px; align-self: center; transition: opacity 0.2s, transform 0.2s; transform: scale(0.9); flex-shrink: 0; }
-    .msg-btn { cursor: pointer; font-size: 0.75rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 4px 8px; border-radius: 8px; }
-    .msg-btn.danger { color: #ef4444; }
-    
-    /* Hover PC / Chat Aktif di HP */
-    .message:hover .msg-actions, .message.active-chat .msg-actions { opacity: 1; pointer-events: auto; transform: scale(1); }
+    .message-text { 
+      font-size: 0.9rem; 
+      line-height: 1.4; 
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
 
-    /* PESAN DIHAPUS STYLES */
-    .deleted-text { font-style: italic; color: var(--text-muted); font-size: 0.85em; display: flex; align-items: center; gap: 4px; }
-    .message.mine .deleted-text { color: rgba(255, 255, 255, 0.7); }
-    .deleted-admin { color: #ef4444 !important; font-weight: 600; font-style: italic; }
-
-    /* READ MORE STYLE */
-    .read-more-btn { color: #38bdf8; font-weight: 600; cursor: pointer; margin-left: 4px; text-decoration: underline; display: inline-block; }
-    .message.mine .read-more-btn { color: #93c5fd; }
-
-    .username-tag { font-size: 0.78rem; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-    .username-admin { color: #f59e0b !important; font-weight: 800 !important; }
-    .admin-badge { background: #f59e0b; color: #000; font-size: 0.6rem; padding: 1px 5px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
-
-    .message-text { font-size: 0.9rem; line-height: 1.4; word-break: break-word; white-space: pre-wrap; text-align: left; }
-    .timestamp { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; text-align: right; opacity: 0.8; }
-    .message.mine .timestamp { color: rgba(255, 255, 255, 0.75); }
+    .timestamp { 
+      font-size: 0.65rem; 
+      color: #94a3b8; 
+      margin-top: 4px; 
+      text-align: right;
+      display: block;
+    }
+    .message.mine .timestamp { 
+      color: rgba(255, 255, 255, 0.75); 
+    }
     
     /* INPUT & PREVIEW AREA */
     .chat-input-wrapper { border-top: 1px solid var(--card-border); background: var(--card-bg); display: flex; flex-direction: column; }
