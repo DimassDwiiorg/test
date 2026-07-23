@@ -211,13 +211,27 @@
   <div id="auth-section" class="glass-card auth-container">
     <h2>ROOM-CHAT</h2>
     <div class="tab-buttons">
-      <button class="tab-btn active" onclick="switchTab('email')">Magic Email</button>
+      <button class="tab-btn active" onclick="switchTab('google')">Google Account</button>
       <button class="tab-btn" onclick="switchTab('username')">Username</button>
     </div>
-    <div id="form-email">
-      <input type="email" id="email-input" placeholder="Masukkan Email Anda...">
-      <button class="btn-primary" onclick="sendMagicLink()">Kirim Link Login</button>
+    
+    <!-- LOGIN GOOGLE -->
+    <div id="form-google">
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+        Masuk lebih cepat & aman menggunakan akun Google kamu.
+      </p>
+      <button class="btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 10px; background: #ffffff; color: #333; border: 1px solid var(--card-border);" onclick="loginWithGoogle()">
+        <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Lanjutkan dengan Google</span>
+      </button>
     </div>
+
+    <!-- LOGIN USERNAME -->
     <div id="form-username" class="hidden">
       <input type="text" id="user-input" placeholder="Username (huruf & angka)">
       <input type="password" id="pass-input" placeholder="Password (min. 6 karakter)">
@@ -357,7 +371,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
-      getAuth, isSignInWithEmailLink, signInWithEmailLink, sendSignInLinkToEmail, 
+      getAuth, GoogleAuthProvider, signInWithPopup, 
       signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
@@ -391,7 +405,7 @@
     const db = getFirestore(app);
 
     const SUPABASE_URL = "https://hyfhhxrnvqhjarwuickw.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5ZmhoeHJudnFoamFyd3VpY2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MDkyMjEsImV4cCI6MjEwMDE4NTIyMX0.HbFmEMi31rdBntURcO7ephYGQSAAYXKHoy4_DgDAEu4";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5ZmhoeXJudnFoamFyd3VpY2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MDkyMjEsImV4cCI6MjEwMDE4NTIyMX0.HbFmEMi31rdBntURcO7ephYGQSAAYXKHoy4_DgDAEu4";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUserData = null;
@@ -463,14 +477,20 @@
       document.getElementById('theme-btn').innerText = newTheme === 'dark' ? '🌙' : '☀️';
     };
 
-    window.sendMagicLink = async () => {
-      const email = document.getElementById('email-input').value.trim();
-      if (!email) return showToast('Masukkan email terlebih dahulu!', 'error');
+    /* LOGIN WITH GOOGLE */
+    window.loginWithGoogle = async () => {
+      const provider = new GoogleAuthProvider();
       try {
-        await sendSignInLinkToEmail(auth, email, { url: window.location.href, handleCodeInApp: true });
-        window.localStorage.setItem('emailForSignIn', email);
-        showToast('Link login dikirim ke email!', 'success');
-      } catch (err) { showToast('Gagal: ' + err.message, 'error'); }
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        
+        const displayName = user.displayName || user.email.split('@')[0];
+        
+        await initUserProfile(user, displayName);
+        showToast(`Selamat datang, ${displayName}!`, 'success');
+      } catch (error) {
+        showToast('Gagal login Google: ' + error.message, 'error');
+      }
     };
 
     window.loginWithUsername = async () => {
@@ -508,8 +528,8 @@
       try {
         let { data: spUser } = await supabase.from('user_profiles').select('*').eq('uid', user.uid).single();
         if (!spUser) {
-          const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(defaultUsername || user.uid)}`;
-          const newUser = { uid: user.uid, username: defaultUsername || "User", photo_url: defaultAvatar, user_color: generateUniqueColor(defaultUsername || user.uid), role: 'user' };
+          const photoUrl = user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(defaultUsername || user.uid)}`;
+          const newUser = { uid: user.uid, username: defaultUsername || "User", photo_url: photoUrl, user_color: generateUniqueColor(defaultUsername || user.uid), role: 'user' };
           await supabase.from('user_profiles').insert([newUser]);
           currentUserData = { ...newUser, photoURL: newUser.photo_url, userColor: newUser.user_color };
         } else {
@@ -864,8 +884,10 @@
 
     /* UTILS */
     onAuthStateChanged(auth, async (user) => {
-      if (user) await initUserProfile(user, user.email ? user.email.split('@')[0] : 'User');
-      else {
+      if (user) {
+        const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+        await initUserProfile(user, displayName);
+      } else {
         document.getElementById('auth-section').classList.remove('hidden');
         document.getElementById('chat-section').classList.add('hidden');
       }
@@ -910,9 +932,9 @@
     window.logout = () => signOut(auth).then(() => location.reload());
     window.handleKeyPress = (e) => { if (e.key === 'Enter') sendMessage(); };
     window.switchTab = (tab) => {
-      document.querySelectorAll('.tab-btn')[0].classList.toggle('active', tab === 'email');
+      document.querySelectorAll('.tab-btn')[0].classList.toggle('active', tab === 'google');
       document.querySelectorAll('.tab-btn')[1].classList.toggle('active', tab === 'username');
-      document.getElementById('form-email').classList.toggle('hidden', tab !== 'email');
+      document.getElementById('form-google').classList.toggle('hidden', tab !== 'google');
       document.getElementById('form-username').classList.toggle('hidden', tab !== 'username');
     };
   </script>
