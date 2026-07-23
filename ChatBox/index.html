@@ -380,6 +380,23 @@
 
     import { initConnect4 } from "./game-connect4.js";
 
+    /* DAFTAR KATA TERLARANG & FUNGSI SENSOR AUTOMATIS */
+    const BAD_WORDS = [
+      "anjing", "anjrit", "anjir", "babi", "monyet", "kunyuk", "bajingan", "asu", 
+      "bangsat", "kontol", "memek", "puki", "pantek", "goblok", "tolol", "idiot", 
+      "bego", "kampang", "lonte", "perek", "tetek", "itil", "pepek", "ngentot", "fuck", "bitch", "asshole"
+    ];
+
+    function filterTeks(str) {
+      if (!str) return str;
+      let cleanText = str;
+      BAD_WORDS.forEach((word) => {
+        const regex = new RegExp(`\\b${word}\\b`, "gi");
+        cleanText = cleanText.replace(regex, "*".repeat(word.length));
+      });
+      return cleanText;
+    }
+
     window.showToast = (message, type = 'info') => {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -393,7 +410,7 @@
 
     const firebaseConfig = {
       apiKey: "AIzaSyCJMRTfrl3j1jL2Bii4cG1IYD1ZoYHrp4Q",
-      authDomain: "galaxy-chat-app-31da3.firebaseapp.com",
+      authDomain: "chat.dimzlabs.my.id",
       projectId: "galaxy-chat-app-31da3",
       storageBucket: "galaxy-chat-app-31da3.firebasestorage.app",
       messagingSenderId: "662698919289",
@@ -484,7 +501,7 @@
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
         
-        const displayName = user.displayName || user.email.split('@')[0];
+        const displayName = filterTeks(user.displayName || user.email.split('@')[0]);
         
         await initUserProfile(user, displayName);
         showToast(`Selamat datang, ${displayName}!`, 'success');
@@ -503,17 +520,18 @@
       loginBtn.classList.add('btn-loading');
       loginBtn.disabled = true;
 
-      const cleanUsername = usernameInput.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const dummyEmail = `${cleanUsername}@${firebaseConfig.projectId}.firebaseapp.com`;
+      const cleanUsername = filterTeks(usernameInput);
+      const safeEmailName = usernameInput.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const dummyEmail = `${safeEmailName}@${firebaseConfig.projectId}.firebaseapp.com`;
 
       try {
         const res = await signInWithEmailAndPassword(auth, dummyEmail, pass);
-        await initUserProfile(res.user, usernameInput);
+        await initUserProfile(res.user, cleanUsername);
         showToast('Login berhasil!', 'success');
       } catch (err) {
         try {
           const newRes = await createUserWithEmailAndPassword(auth, dummyEmail, pass);
-          await initUserProfile(newRes.user, usernameInput);
+          await initUserProfile(newRes.user, cleanUsername);
           showToast('Akun baru berhasil dibuat!', 'success');
         } catch (cErr) { 
           showToast('Error: ' + cErr.message, 'error'); 
@@ -526,14 +544,15 @@
 
     async function initUserProfile(user, defaultUsername) {
       try {
+        const safeName = filterTeks(defaultUsername || "User");
         let { data: spUser } = await supabase.from('user_profiles').select('*').eq('uid', user.uid).single();
         if (!spUser) {
-          const photoUrl = user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(defaultUsername || user.uid)}`;
-          const newUser = { uid: user.uid, username: defaultUsername || "User", photo_url: photoUrl, user_color: generateUniqueColor(defaultUsername || user.uid), role: 'user' };
+          const photoUrl = user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(safeName || user.uid)}`;
+          const newUser = { uid: user.uid, username: safeName, photo_url: photoUrl, user_color: generateUniqueColor(safeName || user.uid), role: 'user' };
           await supabase.from('user_profiles').insert([newUser]);
           currentUserData = { ...newUser, photoURL: newUser.photo_url, userColor: newUser.user_color };
         } else {
-          currentUserData = { uid: spUser.uid, username: spUser.username, photoURL: spUser.photo_url, userColor: generateUniqueColor(spUser.username), role: spUser.role || 'user' };
+          currentUserData = { uid: spUser.uid, username: filterTeks(spUser.username), photoURL: spUser.photo_url, userColor: generateUniqueColor(spUser.username), role: spUser.role || 'user' };
         }
         updateUI();
         loadMessages();
@@ -627,11 +646,14 @@
     };
 
     window.saveProfile = async () => {
-      const newUsername = document.getElementById('edit-username-input').value.trim();
+      const rawUsername = document.getElementById('edit-username-input').value.trim();
       const fileInput = document.getElementById('edit-avatar-file');
       const saveBtn = document.getElementById('save-btn');
       const file = fileInput.files[0];
-      if (!newUsername) return showToast('Username wajib diisi!', 'error');
+      
+      if (!rawUsername) return showToast('Username wajib diisi!', 'error');
+      
+      const newUsername = filterTeks(rawUsername);
       saveBtn.innerText = "Saving..."; saveBtn.disabled = true;
       let uploadedPhotoUrl = currentUserData.photoURL;
 
@@ -652,21 +674,26 @@
 
     window.sendMessage = async () => {
       const input = document.getElementById('message-input');
-      const text = input.value.trim();
-      if (!text || !currentUserData) return;
+      const rawText = input.value.trim();
+      if (!rawText || !currentUserData) return;
       
+      const cleanText = filterTeks(rawText);
+
       const messagePayload = {
         uid: currentUserData.uid, 
         username: currentUserData.username,
         userColor: currentUserData.userColor || generateUniqueColor(currentUserData.username),
         photoURL: currentUserData.photoURL, 
         role: currentUserData.role || 'user',
-        text: text, 
+        text: cleanText, 
         createdAt: serverTimestamp()
       };
 
       if (replyTarget) {
-        messagePayload.replyTo = replyTarget;
+        messagePayload.replyTo = {
+          username: replyTarget.username,
+          text: filterTeks(replyTarget.text)
+        };
       }
 
       input.value = '';
