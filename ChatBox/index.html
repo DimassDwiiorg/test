@@ -1,36 +1,48 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ROOM-CHAT</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>CHAT GALAXY</title>
+  
+  <!-- Google Fonts: Cinzel (Serif Klasik Emas) & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
     :root {
-      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --bg-main: #0a0c10;
-      --card-bg: rgba(30, 41, 59, 0.65);
-      --card-border: rgba(255, 255, 255, 0.12);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --primary: #f59e0b;
-      --primary-hover: #d97706;
-      --input-bg: rgba(15, 23, 42, 0.6);
-      --msg-other: rgba(30, 41, 59, 0.75);
-      --msg-mine: rgba(217, 119, 6, 0.85);
-      --msg-mine-text: #ffffff;
-      --reply-bg: rgba(0, 0, 0, 0.3);
-      --reply-text: #e2e8f0;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
-      --shadow-lg: 0 20px 30px rgba(0, 0, 0, 0.6);
-      --modal-overlay: rgba(0, 0, 0, 0.75);
+      --font-heading: 'Cinzel', serif;
+      --font-body: 'Inter', sans-serif;
+      --bg-dark: #0a0507;
+      --gold-primary: #d4af37;
+      --gold-gradient: linear-gradient(135deg, #c59b27 0%, #f3e082 50%, #b8860b 100%);
+      --gold-hover: linear-gradient(135deg, #d4af37 0%, #fceabb 50%, #c59b27 100%);
+      --card-bg: rgba(12, 10, 14, 0.82);
+      --card-border: rgba(212, 175, 55, 0.25);
+      --card-glow: rgba(184, 134, 11, 0.15);
+      --text-main: #e2e8f0;
+      --text-gold: #e6c865;
+      --text-muted: #8c827a;
+      --input-bg: rgba(5, 4, 6, 0.85);
+      --input-border: rgba(212, 175, 55, 0.2);
+      --msg-other: rgba(25, 20, 26, 0.9);
+      --msg-mine: rgba(184, 134, 11, 0.2);
+      --msg-mine-border: rgba(212, 175, 55, 0.4);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); transition: background-color 0.2s ease, color 0.2s ease; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: var(--font-body); 
+    }
+
     body { 
-      background-color: var(--bg-main); 
+      background-color: var(--bg-dark); 
       color: var(--text-main); 
       min-height: 100vh; 
       min-height: 100dvh; 
@@ -41,223 +53,263 @@
       position: relative;
     }
 
-    /* BACKGROUND VIDEO */
-    .bg-video {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
-      z-index: -2;
-      transform: translate(-50%, -50%);
-      object-fit: cover;
-      filter: brightness(0.65) contrast(1.1);
-    }
-
+    /* BACKGROUND ANIMATION / IMAGE LAYER */
     .bg-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%);
       z-index: -1;
-      pointer-events: none;
+      background: #0a0507 url('https://raw.githubusercontent.com/dimzlabs/assets/main/dark_king_bg.jpg') center/cover no-repeat;
+      filter: brightness(0.6) contrast(1.1);
+    }
+
+    .bg-vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
     }
 
     /* TOAST */
     #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-    .toast { min-width: 280px; padding: 12px 20px; border-radius: 12px; background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--card-border); color: var(--text-main); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: auto; }
+    .toast { min-width: 280px; padding: 12px 20px; border-radius: 8px; background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); color: var(--text-main); box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: auto; }
     .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { border-left: 4px solid #10b981; }
+    .toast.success { border-left: 4px solid #e6c865; }
     .toast.error { border-left: 4px solid #ef4444; }
-    .toast.info { border-left: 4px solid var(--primary); }
+    .toast.info { border-left: 4px solid #3b82f6; }
 
     .glass-card { 
       background: var(--card-bg); 
       backdrop-filter: blur(20px); 
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--card-border); 
-      border-radius: 20px; 
-      box-shadow: var(--shadow-lg); 
+      border-radius: 16px; 
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px var(--card-glow); 
     }
     .hidden { display: none !important; }
 
-    /* AUTH & CHAT UI */
-    .auth-container { width: 90%; max-width: 400px; padding: 36px 28px; text-align: center; }
-    .auth-container h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 24px; color: #fbbf24; text-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
-    .tab-buttons { display: flex; background: var(--input-bg); padding: 4px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--card-border); }
-    .tab-btn { flex: 1; padding: 8px 12px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-weight: 600; font-size: 0.88rem; border-radius: 8px; }
-    .tab-btn.active { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); box-shadow: var(--shadow-sm); }
-    input[type="text"], input[type="email"], input[type="password"], input[type="file"], select { width: 100%; padding: 12px 16px; margin: 8px 0; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 0.9rem; outline: none; }
-    input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, select:focus { border-color: var(--primary); }
-    button.btn-primary { width: 100%; padding: 12px 20px; margin-top: 12px; background: var(--primary); border: none; border-radius: 12px; color: #000000; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
-    button.btn-primary:hover { background: var(--primary-hover); }
-    button.btn-secondary { background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
+    /* AUTH CONTAINER */
+    .auth-container { 
+      width: 90%; 
+      max-width: 380px; 
+      padding: 40px 32px; 
+      text-align: center; 
+    }
+    .auth-container h2 { 
+      font-family: var(--font-heading);
+      font-size: 1.6rem; 
+      font-weight: 800; 
+      letter-spacing: 2px;
+      color: var(--text-gold);
+      text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+      margin-bottom: 28px; 
+      text-transform: uppercase;
+    }
 
-    /* SPINNER LOADING STYLES */
+    .form-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-gold);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"], input[type="file"], select { 
+      width: 100%; 
+      padding: 12px 14px; 
+      background: var(--input-bg); 
+      border: 1px solid var(--input-border); 
+      border-radius: 8px; 
+      color: var(--text-main); 
+      font-size: 0.88rem; 
+      outline: none; 
+      transition: all 0.25s ease;
+    }
+    input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+    }
+
+    button.btn-primary { 
+      width: 100%; 
+      padding: 14px 20px; 
+      margin-top: 10px; 
+      background: var(--gold-gradient); 
+      border: none; 
+      border-radius: 8px; 
+      color: #0d0800; 
+      font-family: var(--font-heading);
+      font-weight: 800; 
+      font-size: 0.85rem; 
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer; 
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
+    }
+    button.btn-primary:hover {
+      background: var(--gold-hover);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+      transform: translateY(-1px);
+    }
+    button.btn-secondary { 
+      background: var(--input-bg); 
+      border: 1px solid var(--card-border); 
+      color: var(--text-gold); 
+      padding: 8px 14px; 
+      border-radius: 8px; 
+      font-weight: 600; 
+      font-size: 0.8rem; 
+      cursor: pointer; 
+      white-space: nowrap; 
+      transition: all 0.2s ease;
+    }
+    button.btn-secondary:hover {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    /* SPINNER LOADING */
     .btn-loading { position: relative; pointer-events: none; color: transparent !important; }
-    .btn-loading::after { content: ""; position: absolute; width: 18px; height: 18px; top: 50%; left: 50%; margin-top: -9px; margin-left: -9px; border: 2px solid rgba(0, 0, 0, 0.3); border-radius: 50%; border-top-color: #000000; animation: spin 0.8s linear infinite; }
+    .btn-loading::after { content: ""; position: absolute; width: 18px; height: 18px; top: 50%; left: 50%; margin-top: -9px; margin-left: -9px; border: 2px solid rgba(0, 0, 0, 0.3); border-radius: 50%; border-top-color: #000; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* CHAT CONTAINER RESPONSIVE */
+    /* CHAT CONTAINER */
     .chat-container { width: 95vw; max-width: 900px; height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
     
-    .chat-header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); gap: 10px; background: rgba(15, 23, 42, 0.4); }
-    .header-title-container { display: flex; align-items: center; gap: 10px; }
-    .header-title-container h3 { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: #fbbf24; }
+    .chat-header { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); gap: 10px; background: rgba(5, 4, 6, 0.6); }
+    .header-title-container { display: flex; align-items: center; gap: 12px; }
+    .header-title-container h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; color: var(--text-gold); letter-spacing: 1px; }
     
-    .online-badge { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .online-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+    .online-badge { background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-gold); font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
+    .online-dot { width: 8px; height: 8px; background-color: var(--gold-primary); border-radius: 50%; box-shadow: 0 0 8px var(--gold-primary); }
 
     .header-actions { display: flex; align-items: center; gap: 12px; }
-    .user-profile-summary { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 30px; cursor: pointer; }
-    .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; display: block; }
+    .user-profile-summary { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 20px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+    .user-profile-summary:hover { border-color: var(--card-border); background: rgba(212, 175, 55, 0.05); }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--gold-primary); }
     
     .avatar-wrapper { position: relative; display: inline-block; flex-shrink: 0; }
-    .admin-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-12deg); font-size: 14px; background: transparent; border: none; box-shadow: none; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); z-index: 2; pointer-events: none; }
+    .admin-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-12deg); font-size: 14px; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); z-index: 2; pointer-events: none; }
 
-    /* CHAT MESSAGES CONTAINER */
-    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; position: relative; }
-    .message { display: flex; gap: 8px; max-width: 85%; align-items: flex-end; position: relative; }
+    /* MESSAGES AREA */
+    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; position: relative; }
+    .message { display: flex; gap: 10px; max-width: 85%; align-items: flex-end; position: relative; }
     .message.mine { align-self: flex-end; flex-direction: row-reverse; }
 
-    /* CONTENT BUBBLE CHAT ALA WA */
     .message-content { 
       background: var(--msg-other); 
       color: var(--text-main); 
-      padding: 6px 10px 8px 12px; 
+      padding: 8px 12px 10px 14px; 
       border-radius: 12px; 
-      border-bottom-left-radius: 2px; 
+      border: 1px solid rgba(255, 255, 255, 0.05);
       position: relative; 
       width: fit-content;
       max-width: 100%;
-      cursor: pointer; 
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
     .message.mine .message-content { 
       background: var(--msg-mine); 
-      color: var(--msg-mine-text); 
-      border-radius: 12px; 
-      border-bottom-right-radius: 2px; 
-      border-bottom-left-radius: 12px;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-    .message-content::after {
-      content: "";
-      display: table;
-      clear: both;
+      border: 1px solid var(--msg-mine-border);
+      color: #fff; 
     }
     
-    /* REPLY DISPLAY INSIDE MESSAGE */
-    .reply-quote { background: var(--reply-bg); border-left: 4px solid var(--primary); border-radius: 6px; padding: 4px 8px; margin-bottom: 6px; font-size: 0.82rem; width: 100%; box-sizing: border-box; }
-    .message.mine .reply-quote { background: rgba(0, 0, 0, 0.3); border-left: 4px solid #ffffff; }
-    .reply-quote-user { font-weight: 700; font-size: 0.75rem; margin-bottom: 2px; color: #fbbf24; }
-    .message.mine .reply-quote-user { color: #ffffff; }
-    .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--reply-text); font-size: 0.78rem; font-weight: 500; }
-    .message.mine .reply-quote-text { color: rgba(255, 255, 255, 0.9); }
+    .reply-quote { background: rgba(0,0,0,0.4); border-left: 3px solid var(--gold-primary); border-radius: 4px; padding: 4px 8px; margin-bottom: 6px; font-size: 0.8rem; }
+    .reply-quote-user { font-weight: 700; font-size: 0.72rem; color: var(--text-gold); margin-bottom: 2px; }
+    .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 0.75rem; }
 
-    /* ACTION BUTTONS (REPLY & DELETE) */
-    .message-actions { opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; transform: scale(0.9); }
-    .message:hover .message-actions, .message.active-chat .message-actions { opacity: 1; pointer-events: auto; transform: scale(1); }
-    .reply-btn { cursor: pointer; font-size: 0.75rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 3px 6px; border-radius: 6px; align-self: center; }
+    .message-actions { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .message:hover .message-actions, .message.active-chat .message-actions { opacity: 1; pointer-events: auto; }
+    .reply-btn { cursor: pointer; font-size: 0.75rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-gold); padding: 3px 6px; border-radius: 6px; }
 
-    /* READ MORE STYLE */
-    .read-more-btn { color: #38bdf8; font-weight: 600; cursor: pointer; margin-left: 4px; text-decoration: underline; display: inline-block; }
-    .message.mine .read-more-btn { color: #fde68a; }
+    .username-tag { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .username-admin { color: #f59e0b !important; font-weight: 800 !important; }
+    .admin-badge { background: #f59e0b; color: #000; font-size: 0.58rem; padding: 1px 4px; border-radius: 4px; font-weight: 800; text-transform: uppercase; }
 
-    /* AURA CHAT ADMIN */
-    .message.admin-msg .message-content { background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(180, 83, 9, 0.45)); border: 1.5px solid #f59e0b; box-shadow: 0 0 16px rgba(245, 158, 11, 0.35); color: #fff; }
-    .username-tag { font-size: 0.75rem; font-weight: 700; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; line-height: 1.2; }
-    .username-admin { color: #fbbf24 !important; font-weight: 800 !important; text-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
-    .admin-badge { background: #f59e0b; color: #000; font-size: 0.6rem; padding: 1px 4px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+    .message-text { font-size: 0.88rem; line-height: 1.4; word-break: break-word; white-space: pre-wrap; display: inline; }
+    .timestamp { font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; margin-left: 8px; float: right; }
 
-    .message-text { font-size: 0.88rem; line-height: 1.35; word-break: break-word; white-space: pre-wrap; display: inline; }
-    .timestamp { font-size: 0.62rem; color: var(--text-muted); margin-top: 2px; margin-left: 8px; float: right; position: relative; top: 4px; opacity: 0.8; }
-    .message.mine .timestamp { color: rgba(255, 255, 255, 0.85); }
-    
-    /* INPUT & REPLY PREVIEW AREA */
-    .chat-input-wrapper { border-top: 1px solid var(--card-border); background: rgba(15, 23, 42, 0.5); display: flex; flex-direction: column; }
-    .reply-preview-container { padding: 8px 16px; background: var(--input-bg); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
-    .reply-preview-info { border-left: 3px solid var(--primary); padding-left: 8px; }
+    /* INPUT AREA */
+    .chat-input-wrapper { border-top: 1px solid var(--card-border); background: rgba(5, 4, 6, 0.8); display: flex; flex-direction: column; }
+    .reply-preview-container { padding: 8px 16px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
+    .reply-preview-info { border-left: 3px solid var(--gold-primary); padding-left: 8px; }
     .close-reply-btn { cursor: pointer; color: var(--text-muted); font-size: 1.1rem; border: none; background: transparent; }
 
-    .chat-input-area { padding: 12px 16px; display: flex; gap: 10px; }
+    .chat-input-area { padding: 14px 20px; display: flex; gap: 10px; }
     .chat-input-area input { flex: 1; margin: 0; }
-    .chat-input-area button { width: auto; padding: 0 20px; margin: 0; }
+    .chat-input-area button { width: auto; padding: 0 24px; margin: 0; }
 
-    /* TYPING INDICATOR BUBBLE */
-    .typing-indicator-container { padding: 4px 16px; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    /* TYPING INDICATOR */
+    .typing-indicator-container { padding: 4px 20px; font-size: 0.78rem; color: var(--text-gold); display: flex; align-items: center; gap: 8px; }
     .typing-dots { display: inline-flex; gap: 3px; }
-    .typing-dots span { width: 4px; height: 4px; background: var(--text-muted); border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out; }
+    .typing-dots span { width: 4px; height: 4px; background: var(--gold-primary); border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out; }
     .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
 
     /* MODAL */
-    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
-    .modal-content { width: 100%; max-width: 420px; padding: 24px; position: relative; }
-    .close-modal { position: absolute; top: 18px; right: 20px; cursor: pointer; font-size: 1.2rem; color: var(--text-muted); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+    .modal-content { width: 100%; max-width: 400px; padding: 28px; position: relative; }
+    .close-modal { position: absolute; top: 18px; right: 20px; cursor: pointer; font-size: 1.2rem; color: var(--text-muted); }
 
-    /* GAME ARENA STYLES */
+    /* GAME ARENA */
     .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
-    .cell { width: 70px; height: 70px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8em; font-weight: 700; cursor: pointer; }
+    .cell { width: 70px; height: 70px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.8em; font-weight: 700; cursor: pointer; color: var(--text-gold); }
 
-    .c4-board-wrapper { background: rgba(17, 24, 39, 0.8); padding: 12px; border-radius: 16px; margin: 16px 0; border: 1px solid var(--card-border); width: 100%; box-sizing: border-box; }
-    .c4-board { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; width: 100%; }
-    .c4-cell { aspect-ratio: 1 / 1; width: 100%; background: rgba(55, 65, 81, 0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4); }
-    .c4-cell:hover { background: #4b5563; transform: scale(1.05); }
-    .c4-cell.red { background: #ef4444; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }
-    .c4-cell.yellow { background: #eab308; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); }
-
-    /* MEDIA QUERY RESPONSIF HP */
     @media (max-width: 600px) {
-      body { padding: 0; align-items: flex-start; }
       .chat-container { width: 100vw; height: 100dvh; border-radius: 0; border: none; }
-      .chat-header { padding: 10px 12px; }
-      .header-title-container h3 { font-size: 0.95rem; }
-      .online-badge { padding: 3px 8px; font-size: 0.7rem; }
-      .btn-secondary { padding: 6px 10px; font-size: 0.78rem; }
-      .user-profile-summary #my-username { max-width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; }
-      .avatar { width: 32px; height: 32px; }
+      .chat-header { padding: 10px 14px; }
+      .auth-container { padding: 32px 20px; }
     }
   </style>
 </head>
 <body>
 
-  <video class="bg-video" autoplay loop muted playsinline>
-    <source src="walpaper.mp4" type="video/mp4">
-  </video>
+  <!-- BACKGROUND LAYER -->
   <div class="bg-overlay"></div>
+  <div class="bg-vignette"></div>
 
   <div id="toast-container"></div>
 
+  <!-- AUTH SECTION -->
   <div id="auth-section" class="glass-card auth-container">
-    <h2>ROOM-CHAT</h2>
-    <div class="tab-buttons">
-      <button class="tab-btn active" onclick="switchTab('email')">Magic Email</button>
-      <button class="tab-btn" onclick="switchTab('username')">Username</button>
-    </div>
-    <div id="form-email">
-      <input type="email" id="email-input" placeholder="Masukkan Email Anda...">
-      <button class="btn-primary" onclick="sendMagicLink()">Kirim Link Login</button>
-    </div>
-    <div id="form-username" class="hidden">
-      <input type="text" id="user-input" placeholder="Username (huruf & angka)">
-      <input type="password" id="pass-input" placeholder="Password (min. 6 karakter)">
-      <button class="btn-primary" onclick="loginWithUsername()">Login / Daftar</button>
+    <h2>CHAT GALAXY</h2>
+    
+    <div id="form-username">
+      <div class="form-group">
+        <label for="user-input">USERNAME</label>
+        <input type="text" id="user-input" placeholder="Masukkan username">
+      </div>
+      
+      <div class="form-group">
+        <label for="display-name-input">NAMA DISPLAY</label>
+        <input type="text" id="display-name-input" placeholder="Nama Anda">
+      </div>
+
+      <div class="form-group hidden">
+        <input type="password" id="pass-input" value="12345678">
+      </div>
+
+      <button class="btn-primary" onclick="loginWithUsername()">MASUK CHAT</button>
     </div>
   </div>
 
+  <!-- CHAT SECTION -->
   <div id="chat-section" class="glass-card chat-container hidden">
     <div class="chat-header">
       <div class="header-title-container">
-        <h3>💬 ROOM-CHAT</h3>
+        <h3>CHAT GALAXY</h3>
         <div class="online-badge">
           <span class="online-dot"></span>
           <span id="online-count">1 Online</span>
@@ -270,13 +322,14 @@
             <span id="my-crown" class="admin-crown hidden">👑</span>
             <img id="my-avatar" src="https://via.placeholder.com/36" class="avatar" alt="PP">
           </div>
-          <span id="my-username" style="font-weight: 600;">User</span>
+          <span id="my-username" style="font-weight: 600; color: var(--text-gold);">User</span>
         </div>
       </div>
     </div>
     
     <div id="chat-messages" class="chat-messages"></div>
 
+    <!-- TYPING INDICATOR AREA -->
     <div id="typing-indicator" class="typing-indicator-container hidden">
       <div class="typing-dots">
         <span></span><span></span><span></span>
@@ -284,10 +337,11 @@
       <span id="typing-text">Seseorang sedang mengetik...</span>
     </div>
 
+    <!-- CHAT INPUT & REPLY WRAPPER -->
     <div class="chat-input-wrapper">
       <div id="reply-preview" class="reply-preview-container hidden">
         <div class="reply-preview-info">
-          <div style="font-size:0.75rem; font-weight:700; color:var(--primary);" id="reply-user-target">Membalas User</div>
+          <div style="font-size:0.75rem; font-weight:700; color:var(--text-gold);" id="reply-user-target">Membalas User</div>
           <div style="font-size:0.8rem; color:var(--text-muted);" id="reply-text-target">Pesan yang dibalas</div>
         </div>
         <button class="close-reply-btn" onclick="cancelReply()">&times;</button>
@@ -295,62 +349,65 @@
 
       <div class="chat-input-area">
         <input type="text" id="message-input" placeholder="Ketik pesan..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
-        <button class="btn-primary" onclick="sendMessage()">Kirim</button>
+        <button class="btn-primary" onclick="sendMessage()">KIRIM</button>
       </div>
     </div>
   </div>
 
+  <!-- EDIT PROFILE MODAL -->
   <div id="profile-modal" class="modal hidden">
     <div class="glass-card modal-content">
       <span class="close-modal" onclick="closeProfileModal()">&times;</span>
-      <h3 style="text-align: center; font-weight: 700; color: #fbbf24;">Edit Profil</h3>
+      <h3 style="text-align: center; font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">EDIT PROFIL</h3>
       <div style="text-align:center; margin: 16px 0;">
-        <img id="preview-img" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary);" src="https://via.placeholder.com/90">
+        <img id="preview-img" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary);" src="https://via.placeholder.com/80">
       </div>
-      <label style="font-size: 0.8rem; font-weight: 600;">Username</label>
+      <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-gold);">NAMA DISPLAY</label>
       <input type="text" id="edit-username-input">
-      <label style="font-size: 0.8rem; font-weight: 600; margin-top: 10px; display: block;">Foto Profil</label>
+      <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-gold); margin-top: 10px; display: block;">FOTO PROFIL</label>
       <input type="file" id="edit-avatar-file" accept="image/*" onchange="previewFile()">
-      <button class="btn-primary" id="save-btn" onclick="saveProfile()">Simpan Profil</button>
-      <button style="width:100%; background:transparent; border:none; color:#ef4444; margin-top:12px; font-weight: 600; cursor:pointer;" onclick="logout()">Logout</button>
+      <button class="btn-primary" id="save-btn" onclick="saveProfile()">SIMPAN PROFIL</button>
+      <button style="width:100%; background:transparent; border:none; color:#ef4444; margin-top:14px; font-weight: 600; cursor:pointer;" onclick="logout()">Logout</button>
     </div>
   </div>
 
+  <!-- GAME HUB MODAL -->
   <div id="game-hub-modal" class="modal hidden">
     <div class="glass-card modal-content">
       <span class="close-modal" onclick="closeModal('game-hub-modal')">&times;</span>
-      <h3 style="font-weight: 700; color: #fbbf24;">🎮 Game Hub Mabar</h3>
+      <h3 style="font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">🎮 GAME HUB</h3>
       
       <div style="margin-top: 16px;">
-        <label style="font-size: 0.8rem; font-weight: 600;">Pilih Permainan:</label>
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-gold);">PILIH PERMAINAN:</label>
         <select id="game-type-select">
           <option value="tictactoe">❌ Tic-Tac-Toe (3x3)</option>
-          <option value="connect4">🔴 Connect 4 (Empat Beruntun)</option>
         </select>
 
-        <label style="font-size: 0.8rem; font-weight: 600; margin-top: 8px; display: block;">Username Lawan:</label>
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-gold); margin-top: 10px; display: block;">USERNAME LAWAN:</label>
         <input type="text" id="invite-username-input" placeholder="Ketik username lawan...">
-        <button class="btn-primary" onclick="sendInvite()">Kirim Undangan</button>
+        <button class="btn-primary" onclick="sendInvite()">KIRIM UNDANGAN</button>
       </div>
     </div>
   </div>
 
+  <!-- INVITE POPUP -->
   <div id="invite-received-modal" class="modal hidden">
     <div class="glass-card modal-content" style="text-align: center;">
-      <h3 style="font-weight: 700; color: #fbbf24;">⚔️ Undangan Mabar!</h3>
+      <h3 style="font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">⚔️ UNDANGAN MABAR</h3>
       <p id="invite-text" style="margin: 16px 0; font-size: 0.9rem; color: var(--text-muted);"></p>
       <div style="display: flex; gap: 10px;">
-        <button class="btn-primary" style="margin: 0;" onclick="acceptInvite()">Terima</button>
+        <button class="btn-primary" style="margin: 0;" onclick="acceptInvite()">TERIMA</button>
         <button class="btn-secondary" style="background: #ef4444; color: white; border:none; flex: 1;" onclick="declineInvite()">Tolak</button>
       </div>
     </div>
   </div>
 
+  <!-- TIC TAC TOE ARENA -->
   <div id="game-arena-modal" class="modal hidden">
     <div class="glass-card modal-content" style="width: auto; text-align: center;">
       <span class="close-modal" onclick="closeModal('game-arena-modal')">&times;</span>
-      <h3 style="font-weight: 700; color: #fbbf24;">Tic-Tac-Toe</h3>
-      <p id="game-status" style="margin-top: 6px; color: var(--primary); font-weight: 600; font-size: 0.88rem;">Menunggu Giliran...</p>
+      <h3 style="font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">TIC-TAC-TOE</h3>
+      <p id="game-status" style="margin-top: 6px; color: var(--text-gold); font-weight: 600; font-size: 0.88rem;">Menunggu Giliran...</p>
       <div class="board" id="board">
         <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
         <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
@@ -360,36 +417,20 @@
     </div>
   </div>
 
-  <div id="c4-arena-modal" class="modal hidden">
-    <div class="glass-card modal-content" style="text-align: center;">
-      <span class="close-modal" onclick="closeModal('c4-arena-modal')">&times;</span>
-      <h3 style="font-weight: 700; color: #fbbf24;">🔴 Connect 4 (Empat Beruntun)</h3>
-      <p id="c4-game-status" style="margin-top: 6px; color: var(--primary); font-weight: 600; font-size: 0.88rem;">Menunggu...</p>
-      
-      <div class="c4-board-wrapper">
-        <div id="c4-board" class="c4-board"></div>
-      </div>
-
-      <button class="btn-secondary" onclick="closeModal('c4-arena-modal')">Keluar</button>
-    </div>
-  </div>
-
+  <!-- MAIN JS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
-      getAuth, isSignInWithEmailLink, signInWithEmailLink, sendSignInLinkToEmail, 
-      signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged 
+      getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
       getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, getDoc, updateDoc, setDoc, deleteDoc
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    import { initConnect4 } from "./game-connect4.js";
-
     window.showToast = (message, type = 'info') => {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      const icons = { success: '👑', error: '❌', info: 'ℹ️' };
       toast.className = `toast ${type}`;
       toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span> <span>${message}</span>`;
       container.appendChild(toast);
@@ -422,76 +463,13 @@
     let replyTarget = null;
     let typingTimeout = null;
 
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.message')) {
-        document.querySelectorAll('.message.active-chat').forEach(msg => {
-          msg.classList.remove('active-chat');
-        });
-      }
-    });
-
-    window.toggleChatActive = (event, element) => {
-      if (event.target.classList.contains('read-more-btn') || event.target.closest('.reply-btn')) {
-        return;
-      }
-      
-      const parentMessage = element.closest('.message');
-      const isAlreadyActive = parentMessage.classList.contains('active-chat');
-      
-      document.querySelectorAll('.message.active-chat').forEach(msg => {
-        msg.classList.remove('active-chat');
-      });
-
-      if (!isAlreadyActive) {
-        parentMessage.classList.add('active-chat');
-      }
-    };
-
-    window.toggleReadMore = (btn) => {
-      const parent = btn.parentElement;
-      const shortText = parent.querySelector('.text-short');
-      const fullText = parent.querySelector('.text-full');
-
-      if (fullText.classList.contains('hidden')) {
-        shortText.classList.add('hidden');
-        fullText.classList.remove('hidden');
-        btn.innerText = ' Sembunyikan';
-      } else {
-        shortText.classList.remove('hidden');
-        fullText.classList.add('hidden');
-        btn.innerText = '... Baca selengkapnya';
-      }
-    };
-
-    function formatMessageText(text, limit = 300) {
-      const cleanText = escapeHTML(text || '');
-      if (cleanText.length <= limit) {
-        return cleanText;
-      }
-      const truncated = cleanText.substring(0, limit);
-      return `
-        <span class="text-short">${truncated}</span>
-        <span class="text-full hidden">${cleanText}</span>
-        <span class="read-more-btn" onclick="toggleReadMore(this)">... Baca selengkapnya</span>
-      `;
-    }
-
-    window.sendMagicLink = async () => {
-      const email = document.getElementById('email-input').value.trim();
-      if (!email) return showToast('Masukkan email terlebih dahulu!', 'error');
-      try {
-        await sendSignInLinkToEmail(auth, email, { url: window.location.href, handleCodeInApp: true });
-        window.localStorage.setItem('emailForSignIn', email);
-        showToast('Link login dikirim ke email!', 'success');
-      } catch (err) { showToast('Gagal: ' + err.message, 'error'); }
-    };
-
     window.loginWithUsername = async () => {
       const usernameInput = document.getElementById('user-input').value.trim();
+      const displayNameInput = document.getElementById('display-name-input').value.trim() || usernameInput;
       const pass = document.getElementById('pass-input').value;
       const loginBtn = document.querySelector('#form-username button');
 
-      if (!usernameInput || !pass) return showToast('Isi username & password!', 'error');
+      if (!usernameInput) return showToast('Isi Username terlebih dahulu!', 'error');
 
       loginBtn.classList.add('btn-loading');
       loginBtn.disabled = true;
@@ -501,12 +479,12 @@
 
       try {
         const res = await signInWithEmailAndPassword(auth, dummyEmail, pass);
-        await initUserProfile(res.user, usernameInput);
-        showToast('Login berhasil!', 'success');
+        await initUserProfile(res.user, displayNameInput);
+        showToast('Berhasil masuk!', 'success');
       } catch (err) {
         try {
           const newRes = await createUserWithEmailAndPassword(auth, dummyEmail, pass);
-          await initUserProfile(newRes.user, usernameInput);
+          await initUserProfile(newRes.user, displayNameInput);
           showToast('Akun baru berhasil dibuat!', 'success');
         } catch (cErr) { 
           showToast('Error: ' + cErr.message, 'error'); 
@@ -522,11 +500,11 @@
         let { data: spUser } = await supabase.from('user_profiles').select('*').eq('uid', user.uid).single();
         if (!spUser) {
           const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(defaultUsername || user.uid)}`;
-          const newUser = { uid: user.uid, username: defaultUsername || "User", photo_url: defaultAvatar, user_color: generateUniqueColor(defaultUsername || user.uid), role: 'user' };
+          const newUser = { uid: user.uid, username: defaultUsername || "User", photo_url: defaultAvatar, user_color: '#e6c865', role: 'user' };
           await supabase.from('user_profiles').insert([newUser]);
           currentUserData = { ...newUser, photoURL: newUser.photo_url, userColor: newUser.user_color };
         } else {
-          currentUserData = { uid: spUser.uid, username: spUser.username, photoURL: spUser.photo_url, userColor: generateUniqueColor(spUser.username), role: spUser.role || 'user' };
+          currentUserData = { uid: spUser.uid, username: spUser.username, photoURL: spUser.photo_url, userColor: '#e6c865', role: spUser.role || 'user' };
         }
         updateUI();
         loadMessages();
@@ -565,3 +543,138 @@
         document.getElementById('online-count').innerText = `${count || 1} Online`;
       });
     }
+
+    window.handleTyping = () => {
+      if (!currentUserData) return;
+      const typingRef = doc(db, "typing", currentUserData.uid);
+      
+      setDoc(typingRef, {
+        username: currentUserData.username,
+        isTyping: true,
+        updatedAt: serverTimestamp()
+      });
+
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        deleteDoc(typingRef);
+      }, 2500);
+    };
+
+    function listenToTyping() {
+      onSnapshot(collection(db, "typing"), (snapshot) => {
+        let typingUsers = [];
+        snapshot.forEach((docSnap) => {
+          if (docSnap.id !== currentUserData?.uid) {
+            const data = docSnap.data();
+            if (data.isTyping) typingUsers.push(data.username);
+          }
+        });
+
+        const typingEl = document.getElementById('typing-indicator');
+        const typingText = document.getElementById('typing-text');
+
+        if (typingUsers.length > 0) {
+          typingText.innerText = `${typingUsers.join(', ')} sedang mengetik...`;
+          typingEl.classList.remove('hidden');
+        } else {
+          typingEl.classList.add('hidden');
+        }
+      });
+    }
+
+    window.sendMessage = async () => {
+      const input = document.getElementById('message-input');
+      const text = input.value.trim();
+      if (!text || !currentUserData) return;
+      
+      const messagePayload = {
+        uid: currentUserData.uid, 
+        username: currentUserData.username,
+        photoURL: currentUserData.photoURL, 
+        role: currentUserData.role || 'user',
+        text: text, 
+        createdAt: serverTimestamp()
+      };
+
+      if (replyTarget) {
+        messagePayload.replyTo = replyTarget;
+      }
+
+      input.value = '';
+      cancelReply();
+      deleteDoc(doc(db, "typing", currentUserData.uid));
+      await addDoc(collection(db, "messages"), messagePayload);
+    };
+
+    function loadMessages() {
+      const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
+      onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('chat-messages');
+        container.innerHTML = '';
+
+        snapshot.forEach((docSnap) => {
+          const msg = docSnap.data();
+          const isMine = msg.uid === currentUserData?.uid;
+          const isAdmin = msg.role === 'admin';
+
+          let timeStr = msg.createdAt?.toDate 
+            ? msg.createdAt.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+            : 'Baru saja';
+
+          let replyHTML = msg.replyTo ? `
+            <div class="reply-quote">
+              <div class="reply-quote-user">${escapeHTML(msg.replyTo.username)}</div>
+              <div class="reply-quote-text">${escapeHTML(msg.replyTo.text)}</div>
+            </div>` : '';
+
+          const msgEl = document.createElement('div');
+          msgEl.className = `message ${isMine ? 'mine' : ''}`;
+          msgEl.innerHTML = `
+            <div class="avatar-wrapper">
+              ${isAdmin ? '<span class="admin-crown">👑</span>' : ''}
+              <img src="${msg.photoURL}" class="avatar">
+            </div>
+            <div class="message-content">
+              ${replyHTML}
+              <span class="username-tag ${isAdmin ? 'username-admin' : ''}" style="color: var(--text-gold);">
+                ${msg.username}
+                ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
+              </span>
+              <div class="message-text">${escapeHTML(msg.text)}</div>
+              <div class="timestamp">${timeStr}</div>
+            </div>
+          `;
+          container.appendChild(msgEl);
+        });
+
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) await initUserProfile(user, user.email ? user.email.split('@')[0] : 'User');
+      else {
+        document.getElementById('auth-section').classList.remove('hidden');
+        document.getElementById('chat-section').classList.add('hidden');
+      }
+    });
+
+    function updateUI() {
+      document.getElementById('auth-section').classList.add('hidden');
+      document.getElementById('chat-section').classList.remove('hidden');
+      document.getElementById('my-username').innerText = currentUserData.username;
+      document.getElementById('my-avatar').src = currentUserData.photoURL;
+      document.getElementById('preview-img').src = currentUserData.photoURL;
+    }
+
+    function escapeHTML(str) { return str ? str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)) : ''; }
+
+    window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
+    window.closeProfileModal = () => document.getElementById('profile-modal').classList.add('hidden');
+    window.openGameHub = () => document.getElementById('game-hub-modal').classList.remove('hidden');
+    window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+    window.logout = () => signOut(auth).then(() => location.reload());
+    window.handleKeyPress = (e) => { if (e.key === 'Enter') sendMessage(); };
+  </script>
+</body>
+</html>
