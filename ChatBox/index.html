@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CHAT GALAXY</title>
+  <title>DARK KING CHAT</title>
   
-  <!-- Google Fonts: Cinzel (Serif Klasik Emas) & Inter -->
+  <!-- Google Fonts: Cinzel & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,21 +17,28 @@
     :root {
       --font-heading: 'Cinzel', serif;
       --font-body: 'Inter', sans-serif;
-      --bg-dark: #0a0507;
-      --gold-primary: #d4af37;
-      --gold-gradient: linear-gradient(135deg, #c59b27 0%, #f3e082 50%, #b8860b 100%);
-      --gold-hover: linear-gradient(135deg, #d4af37 0%, #fceabb 50%, #c59b27 100%);
-      --card-bg: rgba(12, 10, 14, 0.82);
-      --card-border: rgba(212, 175, 55, 0.25);
-      --card-glow: rgba(184, 134, 11, 0.15);
-      --text-main: #e2e8f0;
-      --text-gold: #e6c865;
-      --text-muted: #8c827a;
-      --input-bg: rgba(5, 4, 6, 0.85);
-      --input-border: rgba(212, 175, 55, 0.2);
-      --msg-other: rgba(25, 20, 26, 0.9);
-      --msg-mine: rgba(184, 134, 11, 0.2);
-      --msg-mine-border: rgba(212, 175, 55, 0.4);
+      
+      /* TEMA CRIMSON & GOLD (Sesuai Video) */
+      --bg-dark: #070103;
+      --gold-primary: #f59e0b;
+      --gold-gradient: linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #78350f 100%);
+      --gold-hover: linear-gradient(135deg, #d97706 0%, #fbbf24 50%, #b45309 100%);
+      
+      --crimson-glow: rgba(220, 38, 38, 0.35);
+      --crimson-border: rgba(220, 38, 38, 0.4);
+      --card-bg: rgba(12, 3, 6, 0.82);
+      --card-border: rgba(245, 158, 11, 0.3);
+      
+      --text-main: #f8fafc;
+      --text-gold: #fbbf24;
+      --text-crimson: #ef4444;
+      --text-muted: #94a3b8;
+      
+      --input-bg: rgba(8, 2, 4, 0.9);
+      --input-border: rgba(220, 38, 38, 0.3);
+      --msg-other: rgba(20, 5, 8, 0.9);
+      --msg-mine: rgba(153, 27, 27, 0.35);
+      --msg-mine-border: rgba(239, 68, 68, 0.5);
     }
 
     * { 
@@ -53,16 +60,19 @@
       position: relative;
     }
 
-    /* BACKGROUND ANIMATION / IMAGE LAYER */
-    .bg-overlay {
+    /* BACKGROUND VIDEO LAYER */
+    .bg-video {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: #0a0507 url('https://raw.githubusercontent.com/dimzlabs/assets/main/dark_king_bg.jpg') center/cover no-repeat;
-      filter: brightness(0.6) contrast(1.1);
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: -2;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      filter: brightness(0.75) contrast(1.15);
     }
 
     .bg-vignette {
@@ -72,24 +82,24 @@
       width: 100%;
       height: 100%;
       z-index: -1;
-      background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+      background: radial-gradient(circle, transparent 30%, rgba(5, 0, 2, 0.85) 100%);
     }
 
     /* TOAST */
     #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-    .toast { min-width: 280px; padding: 12px 20px; border-radius: 8px; background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); color: var(--text-main); box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: auto; }
+    .toast { min-width: 280px; padding: 12px 20px; border-radius: 8px; background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--crimson-border); color: var(--text-main); box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 15px var(--crimson-glow); display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: auto; }
     .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { border-left: 4px solid #e6c865; }
-    .toast.error { border-left: 4px solid #ef4444; }
+    .toast.success { border-left: 4px solid var(--gold-primary); }
+    .toast.error { border-left: 4px solid var(--text-crimson); }
     .toast.info { border-left: 4px solid #3b82f6; }
 
     .glass-card { 
       background: var(--card-bg); 
-      backdrop-filter: blur(20px); 
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(24px); 
+      -webkit-backdrop-filter: blur(24px);
       border: 1px solid var(--card-border); 
       border-radius: 16px; 
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px var(--card-glow); 
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 25px var(--crimson-glow); 
     }
     .hidden { display: none !important; }
 
@@ -106,7 +116,7 @@
       font-weight: 800; 
       letter-spacing: 2px;
       color: var(--text-gold);
-      text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+      text-shadow: 0 0 15px rgba(245, 158, 11, 0.5), 0 0 30px rgba(220, 38, 38, 0.3);
       margin-bottom: 28px; 
       text-transform: uppercase;
     }
@@ -138,7 +148,7 @@
     }
     input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
       border-color: var(--gold-primary);
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
     }
 
     button.btn-primary { 
@@ -148,7 +158,7 @@
       background: var(--gold-gradient); 
       border: none; 
       border-radius: 8px; 
-      color: #0d0800; 
+      color: #070103; 
       font-family: var(--font-heading);
       font-weight: 800; 
       font-size: 0.85rem; 
@@ -156,11 +166,11 @@
       text-transform: uppercase;
       cursor: pointer; 
       transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
+      box-shadow: 0 4px 15px rgba(180, 83, 9, 0.4);
     }
     button.btn-primary:hover {
       background: var(--gold-hover);
-      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
       transform: translateY(-1px);
     }
     button.btn-secondary { 
@@ -177,7 +187,7 @@
     }
     button.btn-secondary:hover {
       border-color: var(--gold-primary);
-      background: rgba(212, 175, 55, 0.1);
+      background: rgba(245, 158, 11, 0.15);
     }
 
     /* SPINNER LOADING */
@@ -188,20 +198,20 @@
     /* CHAT CONTAINER */
     .chat-container { width: 95vw; max-width: 900px; height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
     
-    .chat-header { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); gap: 10px; background: rgba(5, 4, 6, 0.6); }
+    .chat-header { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--crimson-border); gap: 10px; background: rgba(8, 2, 4, 0.7); }
     .header-title-container { display: flex; align-items: center; gap: 12px; }
-    .header-title-container h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; color: var(--text-gold); letter-spacing: 1px; }
+    .header-title-container h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; color: var(--text-gold); letter-spacing: 1px; text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
     
-    .online-badge { background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); color: var(--text-gold); font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
+    .online-badge { background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.4); color: var(--text-gold); font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
     .online-dot { width: 8px; height: 8px; background-color: var(--gold-primary); border-radius: 50%; box-shadow: 0 0 8px var(--gold-primary); }
 
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .user-profile-summary { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 20px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
-    .user-profile-summary:hover { border-color: var(--card-border); background: rgba(212, 175, 55, 0.05); }
+    .user-profile-summary:hover { border-color: var(--card-border); background: rgba(245, 158, 11, 0.1); }
     .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--gold-primary); }
     
     .avatar-wrapper { position: relative; display: inline-block; flex-shrink: 0; }
-    .admin-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-12deg); font-size: 14px; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.8)); z-index: 2; pointer-events: none; }
+    .admin-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-12deg); font-size: 14px; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.9)); z-index: 2; pointer-events: none; }
 
     /* MESSAGES AREA */
     .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; position: relative; }
@@ -213,59 +223,36 @@
       color: var(--text-main); 
       padding: 8px 12px 10px 14px; 
       border-radius: 12px; 
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(220, 38, 38, 0.25);
       position: relative; 
       width: fit-content;
       max-width: 100%;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
     .message.mine .message-content { 
       background: var(--msg-mine); 
       border: 1px solid var(--msg-mine-border);
       color: #fff; 
+      box-shadow: 0 4px 12px rgba(153, 27, 27, 0.3);
     }
-    
-    .reply-quote { background: rgba(0,0,0,0.4); border-left: 3px solid var(--gold-primary); border-radius: 4px; padding: 4px 8px; margin-bottom: 6px; font-size: 0.8rem; }
-    .reply-quote-user { font-weight: 700; font-size: 0.72rem; color: var(--text-gold); margin-bottom: 2px; }
-    .reply-quote-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 0.75rem; }
-
-    .message-actions { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-    .message:hover .message-actions, .message.active-chat .message-actions { opacity: 1; pointer-events: auto; }
-    .reply-btn { cursor: pointer; font-size: 0.75rem; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-gold); padding: 3px 6px; border-radius: 6px; }
 
     .username-tag { font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-    .username-admin { color: #f59e0b !important; font-weight: 800 !important; }
+    .username-admin { color: #fbbf24 !important; font-weight: 800 !important; }
     .admin-badge { background: #f59e0b; color: #000; font-size: 0.58rem; padding: 1px 4px; border-radius: 4px; font-weight: 800; text-transform: uppercase; }
 
     .message-text { font-size: 0.88rem; line-height: 1.4; word-break: break-word; white-space: pre-wrap; display: inline; }
     .timestamp { font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; margin-left: 8px; float: right; }
 
     /* INPUT AREA */
-    .chat-input-wrapper { border-top: 1px solid var(--card-border); background: rgba(5, 4, 6, 0.8); display: flex; flex-direction: column; }
-    .reply-preview-container { padding: 8px 16px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
-    .reply-preview-info { border-left: 3px solid var(--gold-primary); padding-left: 8px; }
-    .close-reply-btn { cursor: pointer; color: var(--text-muted); font-size: 1.1rem; border: none; background: transparent; }
-
+    .chat-input-wrapper { border-top: 1px solid var(--crimson-border); background: rgba(8, 2, 4, 0.85); display: flex; flex-direction: column; }
     .chat-input-area { padding: 14px 20px; display: flex; gap: 10px; }
     .chat-input-area input { flex: 1; margin: 0; }
     .chat-input-area button { width: auto; padding: 0 24px; margin: 0; }
 
-    /* TYPING INDICATOR */
-    .typing-indicator-container { padding: 4px 20px; font-size: 0.78rem; color: var(--text-gold); display: flex; align-items: center; gap: 8px; }
-    .typing-dots { display: inline-flex; gap: 3px; }
-    .typing-dots span { width: 4px; height: 4px; background: var(--gold-primary); border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out; }
-    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
-
     /* MODAL */
-    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
     .modal-content { width: 100%; max-width: 400px; padding: 28px; position: relative; }
     .close-modal { position: absolute; top: 18px; right: 20px; cursor: pointer; font-size: 1.2rem; color: var(--text-muted); }
-
-    /* GAME ARENA */
-    .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
-    .cell { width: 70px; height: 70px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.8em; font-weight: 700; cursor: pointer; color: var(--text-gold); }
 
     @media (max-width: 600px) {
       .chat-container { width: 100vw; height: 100dvh; border-radius: 0; border: none; }
@@ -276,15 +263,19 @@
 </head>
 <body>
 
-  <!-- BACKGROUND LAYER -->
-  <div class="bg-overlay"></div>
+  <!-- BACKGROUND VIDEO LAYER -->
+  <video autoplay loop muted playsinline class="bg-video">
+    <!-- GANTI 'video-kamu.mp4' DENGAN NAMA/PATH FILE VIDEO KAMU -->
+    <source src="walpaper.mp4" type="video/mp4">
+    Browser kamu tidak mendukung video background.
+  </video>
   <div class="bg-vignette"></div>
 
   <div id="toast-container"></div>
 
   <!-- AUTH SECTION -->
   <div id="auth-section" class="glass-card auth-container">
-    <h2>CHAT GALAXY</h2>
+    <h2>DARK KING CHAT</h2>
     
     <div id="form-username">
       <div class="form-group">
@@ -309,14 +300,13 @@
   <div id="chat-section" class="glass-card chat-container hidden">
     <div class="chat-header">
       <div class="header-title-container">
-        <h3>CHAT GALAXY</h3>
+        <h3>DARK KING</h3>
         <div class="online-badge">
           <span class="online-dot"></span>
           <span id="online-count">1 Online</span>
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn-secondary" onclick="openGameHub()">🎮 Mabar</button>
         <div class="user-profile-summary" onclick="openProfileModal()">
           <div class="avatar-wrapper">
             <span id="my-crown" class="admin-crown hidden">👑</span>
@@ -329,26 +319,10 @@
     
     <div id="chat-messages" class="chat-messages"></div>
 
-    <!-- TYPING INDICATOR AREA -->
-    <div id="typing-indicator" class="typing-indicator-container hidden">
-      <div class="typing-dots">
-        <span></span><span></span><span></span>
-      </div>
-      <span id="typing-text">Seseorang sedang mengetik...</span>
-    </div>
-
-    <!-- CHAT INPUT & REPLY WRAPPER -->
+    <!-- CHAT INPUT WRAPPER -->
     <div class="chat-input-wrapper">
-      <div id="reply-preview" class="reply-preview-container hidden">
-        <div class="reply-preview-info">
-          <div style="font-size:0.75rem; font-weight:700; color:var(--text-gold);" id="reply-user-target">Membalas User</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);" id="reply-text-target">Pesan yang dibalas</div>
-        </div>
-        <button class="close-reply-btn" onclick="cancelReply()">&times;</button>
-      </div>
-
       <div class="chat-input-area">
-        <input type="text" id="message-input" placeholder="Ketik pesan..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
+        <input type="text" id="message-input" placeholder="Ketik pesan..." onkeypress="handleKeyPress(event)">
         <button class="btn-primary" onclick="sendMessage()">KIRIM</button>
       </div>
     </div>
@@ -358,62 +332,11 @@
   <div id="profile-modal" class="modal hidden">
     <div class="glass-card modal-content">
       <span class="close-modal" onclick="closeProfileModal()">&times;</span>
-      <h3 style="text-align: center; font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">EDIT PROFIL</h3>
+      <h3 style="text-align: center; font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">PROFIL KING</h3>
       <div style="text-align:center; margin: 16px 0;">
         <img id="preview-img" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary);" src="https://via.placeholder.com/80">
       </div>
-      <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-gold);">NAMA DISPLAY</label>
-      <input type="text" id="edit-username-input">
-      <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-gold); margin-top: 10px; display: block;">FOTO PROFIL</label>
-      <input type="file" id="edit-avatar-file" accept="image/*" onchange="previewFile()">
-      <button class="btn-primary" id="save-btn" onclick="saveProfile()">SIMPAN PROFIL</button>
-      <button style="width:100%; background:transparent; border:none; color:#ef4444; margin-top:14px; font-weight: 600; cursor:pointer;" onclick="logout()">Logout</button>
-    </div>
-  </div>
-
-  <!-- GAME HUB MODAL -->
-  <div id="game-hub-modal" class="modal hidden">
-    <div class="glass-card modal-content">
-      <span class="close-modal" onclick="closeModal('game-hub-modal')">&times;</span>
-      <h3 style="font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">🎮 GAME HUB</h3>
-      
-      <div style="margin-top: 16px;">
-        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-gold);">PILIH PERMAINAN:</label>
-        <select id="game-type-select">
-          <option value="tictactoe">❌ Tic-Tac-Toe (3x3)</option>
-        </select>
-
-        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-gold); margin-top: 10px; display: block;">USERNAME LAWAN:</label>
-        <input type="text" id="invite-username-input" placeholder="Ketik username lawan...">
-        <button class="btn-primary" onclick="sendInvite()">KIRIM UNDANGAN</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- INVITE POPUP -->
-  <div id="invite-received-modal" class="modal hidden">
-    <div class="glass-card modal-content" style="text-align: center;">
-      <h3 style="font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">⚔️ UNDANGAN MABAR</h3>
-      <p id="invite-text" style="margin: 16px 0; font-size: 0.9rem; color: var(--text-muted);"></p>
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-primary" style="margin: 0;" onclick="acceptInvite()">TERIMA</button>
-        <button class="btn-secondary" style="background: #ef4444; color: white; border:none; flex: 1;" onclick="declineInvite()">Tolak</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TIC TAC TOE ARENA -->
-  <div id="game-arena-modal" class="modal hidden">
-    <div class="glass-card modal-content" style="width: auto; text-align: center;">
-      <span class="close-modal" onclick="closeModal('game-arena-modal')">&times;</span>
-      <h3 style="font-family: var(--font-heading); color: var(--text-gold); font-weight: 700;">TIC-TAC-TOE</h3>
-      <p id="game-status" style="margin-top: 6px; color: var(--text-gold); font-weight: 600; font-size: 0.88rem;">Menunggu Giliran...</p>
-      <div class="board" id="board">
-        <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
-        <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
-        <div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div>
-      </div>
-      <button class="btn-secondary" onclick="closeModal('game-arena-modal')">Keluar</button>
+      <button style="width:100%; background:transparent; border:none; color:var(--text-crimson); margin-top:14px; font-weight: 700; cursor:pointer;" onclick="logout()">LOGOUT</button>
     </div>
   </div>
 
@@ -424,7 +347,7 @@
       getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
-      getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, getDoc, updateDoc, setDoc, deleteDoc
+      getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     window.showToast = (message, type = 'info') => {
@@ -452,16 +375,10 @@
     const db = getFirestore(app);
 
     const SUPABASE_URL = "https://hyfhhxrnvqhjarwuickw.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5ZmhoeHJudnFoamFyd3VpY2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MDkyMjEsImV4cCI6MjEwMDE4NTIyMX0.HbFmEMi31rdBntURcO7ephYGQSAAYXKHoy4_DgDAEu4";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5ZmhoeXJudnFoamFyd3VpY2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MDkyMjEsImV4cCI6MjEwMDE4NTIyMX0.HbFmEMi31rdBntURcO7ephYGQSAAYXKHoy4_DgDAEu4";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUserData = null;
-    let activeTTTMatchRef = null;
-    let tttSymbol = 'X';
-    let pendingInviteId = null;
-
-    let replyTarget = null;
-    let typingTimeout = null;
 
     window.loginWithUsername = async () => {
       const usernameInput = document.getElementById('user-input').value.trim();
@@ -500,86 +417,15 @@
         let { data: spUser } = await supabase.from('user_profiles').select('*').eq('uid', user.uid).single();
         if (!spUser) {
           const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(defaultUsername || user.uid)}`;
-          const newUser = { uid: user.uid, username: defaultUsername || "User", photo_url: defaultAvatar, user_color: '#e6c865', role: 'user' };
+          const newUser = { uid: user.uid, username: defaultUsername || "User", photo_url: defaultAvatar, role: 'user' };
           await supabase.from('user_profiles').insert([newUser]);
-          currentUserData = { ...newUser, photoURL: newUser.photo_url, userColor: newUser.user_color };
+          currentUserData = { ...newUser, photoURL: newUser.photo_url };
         } else {
-          currentUserData = { uid: spUser.uid, username: spUser.username, photoURL: spUser.photo_url, userColor: '#e6c865', role: spUser.role || 'user' };
+          currentUserData = { uid: spUser.uid, username: spUser.username, photoURL: spUser.photo_url, role: spUser.role || 'user' };
         }
         updateUI();
         loadMessages();
-        listenToInvites();
-        setupPresence();
-        listenToTyping();
       } catch (error) { console.error("Profile Error:", error); }
-    }
-
-    async function setupPresence() {
-      if (!currentUserData) return;
-      const userPresenceRef = doc(db, "presence", currentUserData.uid);
-      
-      await setDoc(userPresenceRef, {
-        username: currentUserData.username,
-        lastSeen: serverTimestamp()
-      });
-
-      setInterval(() => {
-        setDoc(userPresenceRef, {
-          username: currentUserData.username,
-          lastSeen: serverTimestamp()
-        });
-      }, 20000);
-
-      onSnapshot(collection(db, "presence"), (snapshot) => {
-        let count = 0;
-        const now = Date.now();
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.lastSeen) {
-            const timeDiff = (now - data.lastSeen.toDate().getTime()) / 1000;
-            if (timeDiff < 40) count++;
-          }
-        });
-        document.getElementById('online-count').innerText = `${count || 1} Online`;
-      });
-    }
-
-    window.handleTyping = () => {
-      if (!currentUserData) return;
-      const typingRef = doc(db, "typing", currentUserData.uid);
-      
-      setDoc(typingRef, {
-        username: currentUserData.username,
-        isTyping: true,
-        updatedAt: serverTimestamp()
-      });
-
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        deleteDoc(typingRef);
-      }, 2500);
-    };
-
-    function listenToTyping() {
-      onSnapshot(collection(db, "typing"), (snapshot) => {
-        let typingUsers = [];
-        snapshot.forEach((docSnap) => {
-          if (docSnap.id !== currentUserData?.uid) {
-            const data = docSnap.data();
-            if (data.isTyping) typingUsers.push(data.username);
-          }
-        });
-
-        const typingEl = document.getElementById('typing-indicator');
-        const typingText = document.getElementById('typing-text');
-
-        if (typingUsers.length > 0) {
-          typingText.innerText = `${typingUsers.join(', ')} sedang mengetik...`;
-          typingEl.classList.remove('hidden');
-        } else {
-          typingEl.classList.add('hidden');
-        }
-      });
     }
 
     window.sendMessage = async () => {
@@ -596,13 +442,7 @@
         createdAt: serverTimestamp()
       };
 
-      if (replyTarget) {
-        messagePayload.replyTo = replyTarget;
-      }
-
       input.value = '';
-      cancelReply();
-      deleteDoc(doc(db, "typing", currentUserData.uid));
       await addDoc(collection(db, "messages"), messagePayload);
     };
 
@@ -621,12 +461,6 @@
             ? msg.createdAt.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
             : 'Baru saja';
 
-          let replyHTML = msg.replyTo ? `
-            <div class="reply-quote">
-              <div class="reply-quote-user">${escapeHTML(msg.replyTo.username)}</div>
-              <div class="reply-quote-text">${escapeHTML(msg.replyTo.text)}</div>
-            </div>` : '';
-
           const msgEl = document.createElement('div');
           msgEl.className = `message ${isMine ? 'mine' : ''}`;
           msgEl.innerHTML = `
@@ -635,7 +469,6 @@
               <img src="${msg.photoURL}" class="avatar">
             </div>
             <div class="message-content">
-              ${replyHTML}
               <span class="username-tag ${isAdmin ? 'username-admin' : ''}" style="color: var(--text-gold);">
                 ${msg.username}
                 ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
@@ -671,8 +504,6 @@
 
     window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
     window.closeProfileModal = () => document.getElementById('profile-modal').classList.add('hidden');
-    window.openGameHub = () => document.getElementById('game-hub-modal').classList.remove('hidden');
-    window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
     window.logout = () => signOut(auth).then(() => location.reload());
     window.handleKeyPress = (e) => { if (e.key === 'Enter') sendMessage(); };
   </script>
